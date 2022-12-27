@@ -8,9 +8,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -22,7 +22,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getFilms() {
-        return films.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(films.values());
     }
 
     @PostMapping
@@ -37,7 +37,7 @@ public class FilmController {
             filmId++;
             film.setId(filmId);
             films.put(filmId, film);
-            log.debug("Created film record with Film-object {}", film.toString());
+            log.debug("Created film record with Film-object {}", film);
         }
         return film;
     }
