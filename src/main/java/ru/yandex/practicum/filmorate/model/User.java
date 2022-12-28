@@ -13,7 +13,7 @@ public class User {
     private LocalDate birthday;
 
     public User normalize() {
-        if (this.name == null) this.name = this.login;
+        if (this.name == null || this.name.isBlank()) this.name = this.login;
         return this;
     }
 }

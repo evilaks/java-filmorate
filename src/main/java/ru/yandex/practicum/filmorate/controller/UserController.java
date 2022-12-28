@@ -35,7 +35,8 @@ public class UserController {
         } else {
             userId++;
             user.setId(userId);
-            users.put(userId, user.normalize());
+            user = user.normalize();
+            users.put(userId, user);
             log.debug("Created user record with User-object {}", user);
         }
         return user;
@@ -47,7 +48,8 @@ public class UserController {
         if (!isValidUser(user)) {
             throw new ValidationException("Invalid user properties");
         } else if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user.normalize());
+            user = user.normalize();
+            users.put(user.getId(), user);
             log.debug("Updated user record with id {}", user.getId());
         } else {
             log.debug("User with such id not found");

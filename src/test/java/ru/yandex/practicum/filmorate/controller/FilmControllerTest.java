@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -28,6 +30,9 @@ public class FilmControllerTest {
     void addFilm() {
         Film actual = testFilmController.addFilm(testFilm);
         assertEquals(1, actual.getId(), "Film object doesn't get id from filmController");
+
+        testFilm.setId(1);
+        assertThrows(BadRequestException.class, () -> testFilmController.addFilm(testFilm), "id already exist");
 
         testFilm.setId(0);
         testFilm.setDuration(-1);
@@ -67,6 +72,9 @@ public class FilmControllerTest {
 
         Film actual = testFilmController.updateFilm(testFilm);
         assertEquals(testFilm, actual, "Updated film objects doesn't match");
+
+        testFilm.setId(2);
+        assertThrows(NotFoundException.class, () -> testFilmController.updateFilm(testFilm), "id not found");
 
         actual.setDuration(-1);
         assertThrows(ValidationException.class, () -> testFilmController.updateFilm(actual), "Wrong duration");
