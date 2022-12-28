@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) {
+    public Film addFilm(@RequestBody @Valid Film film) {
         log.debug("Received POST-request with Film object: {}", film.toString());
         if (films.containsKey(film.getId())) {
             log.debug("Film with such id already exist");
@@ -43,7 +44,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@RequestBody @Valid Film film) {
         log.debug("Received PUT-request at /films endpoint with Film-object {}", film.toString());
         if (!isFilmValid(film)) {
             throw new ValidationException("Invalid film-object received");

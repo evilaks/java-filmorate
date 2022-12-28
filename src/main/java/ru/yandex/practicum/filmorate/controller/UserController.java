@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) {
+    public User addUser(@RequestBody @Valid User user) {
         log.debug("Received POST-request at /users endpoint with User object: {}", user.toString());
         if (users.containsKey(user.getId())) {
             log.debug("User with such id already exist");
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody @Valid User user) {
         log.debug("Received PUT-request at /users endpoint with User-object {}", user.toString());
         if (!isValidUser(user)) {
             throw new ValidationException("Invalid user properties");
