@@ -12,8 +12,8 @@ import java.time.LocalDate;
 
 public class FilmControllerTest {
 
-    Film testFilm;
-    FilmController testFilmController;
+    private Film testFilm;
+    private FilmController testFilmController;
 
     @BeforeEach
     void beforeEach() {
@@ -97,5 +97,16 @@ public class FilmControllerTest {
         actual.setName("name");
         actual.setReleaseDate(LocalDate.of(1895, 12, 27));
         assertThrows(ValidationException.class, () -> testFilmController.updateFilm(actual), "Wrong release date");
+    }
+
+    @Test
+    void getFilms() {
+        testFilmController.addFilm(testFilm);
+
+        assertEquals(1, testFilmController.getFilms().size(), "Wrong size of returning films array");
+
+        testFilm.setId(1);
+        Film actual = testFilmController.getFilms().get(0);
+        assertEquals(testFilm, actual, "Returning film doesn't match added one");
     }
 }

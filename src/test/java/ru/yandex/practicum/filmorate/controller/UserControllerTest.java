@@ -12,8 +12,8 @@ import java.time.LocalDate;
 
 public class UserControllerTest {
 
-    User testUser;
-    UserController testUserController;
+    private User testUser;
+    private UserController testUserController;
 
     @BeforeEach
     void beforeEach() {
@@ -111,5 +111,16 @@ public class UserControllerTest {
         actual.setEmail("mail@example.com");
         actual.setBirthday(LocalDate.now().plusDays(1));
         assertThrows(ValidationException.class, () -> testUserController.updateUser(actual), "wrong bithday");
+    }
+
+    @Test
+    void getUsers() {
+        testUserController.addUser(testUser);
+
+        assertEquals(1, testUserController.getUsers().size(), "Wrong size of returning users array");
+
+        testUser.setId(1);
+        User actual = testUserController.getUsers().get(0);
+        assertEquals(testUser, actual, "Returning user doesn't match added one");
     }
 }
