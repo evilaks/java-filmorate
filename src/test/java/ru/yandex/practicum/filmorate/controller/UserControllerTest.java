@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
@@ -23,7 +25,8 @@ public class UserControllerTest {
         testUser.setEmail("mail@example.com");
         testUser.setBirthday(LocalDate.of(2000, 1, 1));
 
-        testUserController = new UserController();
+        UserStorage testUserStorage = new InMemoryUserStorage();
+        testUserController = new UserController(testUserStorage);
     }
 
     @Test
