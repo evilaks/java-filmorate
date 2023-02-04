@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -17,4 +19,18 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> likes;
+
+    public Film addLike(long userId) {
+        likes.add(userId);
+        return this;
+    }
+
+    public Film removeLike(long userId) {
+        likes.remove(userId);
+        return this;
+    }
+
+    public List<Long> getLikes() {
+        return new ArrayList<>(likes);
+    }
 }
