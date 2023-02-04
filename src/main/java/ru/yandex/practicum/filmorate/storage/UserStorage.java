@@ -10,6 +10,8 @@ public interface UserStorage {
 
     List<User> getAll();
 
+    User get(long id);
+
     User update(User user);
 
     void remove(User user);

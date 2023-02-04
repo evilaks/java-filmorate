@@ -35,17 +35,17 @@ public class UserControllerTest {
         assertEquals(1, actual.getId(), "User object doesn't get id from userController");
 
         // existing id
-        testUser.setId(1);
+        testUser.setId(1L);
         assertThrows(BadRequestException.class, () -> testUserController.addUser(testUser), "id already exist");
 
         // name validation test
-        testUser.setId(0);
+        testUser.setId(0L);
         testUser.setName("");
         actual = testUserController.addUser(testUser);
         assertEquals("userlogin", actual.getName(), "empty username");
 
         // login validation test
-        testUser.setId(0);
+        testUser.setId(0L);
         testUser.setName("username");
         testUser.setLogin("");
         assertThrows(ValidationException.class, () -> testUserController.addUser(testUser), "empty login");
@@ -73,7 +73,7 @@ public class UserControllerTest {
         // success test
         User actualUser = testUserController.addUser(testUser);
 
-        testUser.setId(1);
+        testUser.setId(1L);
         assertEquals(actualUser, testUser, "Added film objects doesn't match");
 
         testUser.setName("newname");
@@ -85,11 +85,11 @@ public class UserControllerTest {
         assertEquals(testUser, actual, "Updated user objects doesn't match");
 
         // unknown id
-        actual.setId(2);
+        actual.setId(2L);
         assertThrows(NotFoundException.class, () -> testUserController.updateUser(actual), "unknown id");
 
         // name validation test
-        actual.setId(1);
+        actual.setId(1L);
         actual.setName("");
         String actualName = testUserController.updateUser(actual).getName();
         assertEquals(actual.getLogin(), actualName, "empty username");
@@ -122,7 +122,7 @@ public class UserControllerTest {
 
         assertEquals(1, testUserController.getUsers().size(), "Wrong size of returning users array");
 
-        testUser.setId(1);
+        testUser.setId(1L);
         User actual = testUserController.getUsers().get(0);
         assertEquals(testUser, actual, "Returning user doesn't match added one");
     }

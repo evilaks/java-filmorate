@@ -10,6 +10,8 @@ public interface FilmStorage {
 
     List<Film> getAll();
 
+    Film get(long id);
+
     Film update(Film film);
 
     void remove(Film film);

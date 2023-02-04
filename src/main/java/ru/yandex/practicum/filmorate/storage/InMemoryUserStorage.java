@@ -16,8 +16,8 @@ import java.util.List;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private int userId = 0;
+    private final HashMap<Long, User> users = new HashMap<>();
+    private long userId = 0;
 
     @Override
     public User add(User user) {
@@ -39,6 +39,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public User get(long id) {
+        return users.get(id);
     }
 
     @Override
