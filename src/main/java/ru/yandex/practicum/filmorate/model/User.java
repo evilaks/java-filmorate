@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -34,7 +34,7 @@ public class User {
         if (friends.contains(friendId)) {
             friends.remove(friendId);
         } else {
-            throw new FriendNotFoundException("Friend not found");
+            throw new NotFoundException("Friend not found");
         }
         return this;
     }

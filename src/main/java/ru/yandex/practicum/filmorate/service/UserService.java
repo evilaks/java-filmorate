@@ -1,16 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-/*
-Создайте UserService, который будет отвечать за такие операции с пользователями,
-как добавление в друзья, удаление из друзей, вывод списка общих друзей.
-Пока пользователям не надо одобрять заявки в друзья — добавляем сразу.
-То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены.
- */
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
-import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -33,14 +24,10 @@ public class UserService {
     }
 
     public User removeFriend(User user, long friendId) {
-        try {
-            User friend = userStorage.get(friendId);
-            friend.removeFriend(user.getId());
-            userStorage.update(friend);
-            return userStorage.update(user.removeFriend(friendId));
-        } catch (FriendNotFoundException e) {
-            throw new BadRequestException("Wrong friend id");
-        }
+        User friend = userStorage.get(friendId);
+        friend.removeFriend(user.getId());
+        userStorage.update(friend);
+        return userStorage.update(user.removeFriend(friendId));
     }
 
     public List<User> getFreindsList(User user) {
