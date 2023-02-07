@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -32,10 +32,13 @@ public class FilmService {
 
     public Film removeLike(Long filmId, Long userId) {
         Film film = filmStorage.get(filmId);
+        userStorage.get(userId); // check if user exist, else throw 404
+
         if (film.getLikes().contains(userId)) {
             film.removeLike(userId);
             filmStorage.update(film);
         } else throw new NotFoundException("Film has no like from user " + userId);
+
         return film;
     }
 
