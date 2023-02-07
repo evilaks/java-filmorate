@@ -1,13 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
-/*
-Создайте FilmService, который будет отвечать за операции с фильмами, — добавление и удаление лайка,
-вывод 10 наиболее популярных фильмов по количеству лайков. Пусть пока каждый пользователь может
-поставить лайк фильму только один раз.
- */
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -25,25 +21,29 @@ public class FilmService {
     public Film addLike(Long filmId, Long userId) {
         Film film = filmStorage.get(filmId);
         userStorage.get(userId); // check if user exist, else throw 404
-        // todo check if film already has this lke
-        film.addLike(userId);
-        filmStorage.update(film);
+
+        if (!film.getLikes().contains(userId)) {
+            film.addLike(userId);
+            filmStorage.update(film);
+        } else throw new BadRequestException("The film has already got like from user " + userId);
+
         return film;
     }
 
     public Film removeLike(Long filmId, Long userId) {
         Film film = filmStorage.get(filmId);
-        // todo check what's happened if like doesn't exist
-        film.removeLike(userId);
-        filmStorage.update(film);
+        if (film.getLikes().contains(userId)) {
+            film.removeLike(userId);
+            filmStorage.update(film);
+        } else throw new NotFoundException("Film has no like from user " + userId);
         return film;
     }
 
-    public List<Film> getPopularFilms() {
+    public List<Film> getPopularFilms(int count) {
         Comparator<Film> filmComparator = (f1, f2) -> f2.getLikes().size() - f1.getLikes().size();
         return filmStorage.getAll().stream()
                 .sorted(filmComparator)
-                .limit(10)
+                .limit(count)
                 .collect(Collectors.toList());
     }
 }
