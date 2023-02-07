@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -26,7 +27,8 @@ public class UserControllerTest {
         testUser.setBirthday(LocalDate.of(2000, 1, 1));
 
         UserStorage testUserStorage = new InMemoryUserStorage();
-        testUserController = new UserController(testUserStorage);
+        UserService testUserService = new UserService(testUserStorage);
+        testUserController = new UserController(testUserStorage, testUserService);
     }
 
     @Test

@@ -36,9 +36,29 @@ public class UserController {
         return userStorage.update(user);
     }
 
-    @GetMapping("/user/{}/friends")
-    public List<User> getUserFriends(@PathVariable Long userId) {
+    @GetMapping("/users/{userId}")
+    public User getUser(@PathVariable("userId") Long userId) {
+        return userStorage.get(userId);
+    }
+
+    @GetMapping("/users/{userId}/friends")
+    public List<User> getUserFriends(@PathVariable("userId") Long userId) {
         return userService.getFreindsList(userStorage.get(userId));
+    }
+
+    @PutMapping("/users/{userId}/friends/{friendId}")
+    public User addFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
+        return userService.addFriend(userStorage.get(userId), friendId);
+    }
+
+    @DeleteMapping("/users/{userId}/friends/{friendId}")
+    public User removeFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
+        return userService.removeFriend(userStorage.get(userId), friendId);
+    }
+
+    @GetMapping("/users/{userId}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable("userId") Long userId, @PathVariable("otherId") Long otherId) {
+        return userService.getMutualFriends(userStorage.get(userId), userStorage.get(otherId));
     }
 
 }
