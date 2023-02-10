@@ -1,78 +1,64 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/users")
+@RequestMapping
+@RequiredArgsConstructor
 public class UserController {
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private int userId = 0;
 
-    @GetMapping
+    private final UserStorage userStorage;
+    private final UserService userService;
+
+    @GetMapping("/users")
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return userStorage.getAll();
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public User addUser(@RequestBody @Valid User user) {
         log.debug("Received POST-request at /users endpoint with User object: {}", user.toString());
-        if (users.containsKey(user.getId())) {
-            log.debug("User with such id already exist");
-            throw new BadRequestException("User with such id already exist");
-        } else if (!isValidUser(user)) {
-            throw new ValidationException("Invalid user properties");
-        } else {
-            userId++;
-            user.setId(userId);
-            user = user.normalize();
-            users.put(userId, user);
-            log.debug("Created user record with User-object {}", user);
-        }
-        return user;
+        return userStorage.add(user);
     }
 
-    @PutMapping
+    @PutMapping("/users")
     public User updateUser(@RequestBody @Valid User user) {
         log.debug("Received PUT-request at /users endpoint with User-object {}", user.toString());
-        if (!isValidUser(user)) {
-            throw new ValidationException("Invalid user properties");
-        } else if (users.containsKey(user.getId())) {
-            user = user.normalize();
-            users.put(user.getId(), user);
-            log.debug("Updated user record with id {}", user.getId());
-        } else {
-            log.debug("User with such id not found");
-            throw new NotFoundException("User with such id not found");
-        }
-        return user;
+        return userStorage.update(user);
     }
 
-    private boolean isValidUser(User user) {
-        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.debug("Invalid User-object: login is blank");
-            return false;
-        }
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.debug("Invalid User-object: email is invalid");
-            return false;
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.debug("Invalid User-object: birthday is from future");
-            return false;
-        }
-        return true;
+    @GetMapping("/users/{userId}")
+    public User getUser(@PathVariable("userId") Long userId) {
+        return userStorage.get(userId);
+    }
+
+    @GetMapping("/users/{userId}/friends")
+    public List<User> getUserFriends(@PathVariable("userId") Long userId) {
+        return userService.getFreindsList(userStorage.get(userId));
+    }
+
+    @PutMapping("/users/{userId}/friends/{friendId}")
+    public User addFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
+        return userService.addFriend(userStorage.get(userId), friendId);
+    }
+
+    @DeleteMapping("/users/{userId}/friends/{friendId}")
+    public User removeFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
+        return userService.removeFriend(userStorage.get(userId), friendId);
+    }
+
+    @GetMapping("/users/{userId}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable("userId") Long userId, @PathVariable("otherId") Long otherId) {
+        return userService.getMutualFriends(userStorage.get(userId), userStorage.get(otherId));
     }
 
 }

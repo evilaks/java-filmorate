@@ -7,6 +7,11 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -23,7 +28,10 @@ public class FilmControllerTest {
         testFilm.setReleaseDate(LocalDate.of(2000, 10, 10));
         testFilm.setDuration(100);
 
-        testFilmController = new FilmController();
+        FilmStorage testFilmStorage = new InMemoryFilmStorage();
+        UserStorage testUserStorage = new InMemoryUserStorage();
+        FilmService testFilmService = new FilmService(testFilmStorage, testUserStorage);
+        testFilmController = new FilmController(testFilmStorage, testFilmService);
     }
 
     @Test
@@ -31,10 +39,10 @@ public class FilmControllerTest {
         Film actual = testFilmController.addFilm(testFilm);
         assertEquals(1, actual.getId(), "Film object doesn't get id from filmController");
 
-        testFilm.setId(1);
+        testFilm.setId(1L);
         assertThrows(BadRequestException.class, () -> testFilmController.addFilm(testFilm), "id already exist");
 
-        testFilm.setId(0);
+        testFilm.setId(0L);
         testFilm.setDuration(-1);
         assertThrows(ValidationException.class, () -> testFilmController.addFilm(testFilm), "Wrong duration");
 
@@ -62,7 +70,7 @@ public class FilmControllerTest {
     void updateFilm() {
         Film actualFilm = testFilmController.addFilm(testFilm);
 
-        testFilm.setId(1);
+        testFilm.setId(1L);
         assertEquals(testFilm, actualFilm, "Added film objects doesn't match");
 
         testFilm.setName("new name");
@@ -73,7 +81,7 @@ public class FilmControllerTest {
         Film actual = testFilmController.updateFilm(testFilm);
         assertEquals(testFilm, actual, "Updated film objects doesn't match");
 
-        testFilm.setId(2);
+        testFilm.setId(2L);
         assertThrows(NotFoundException.class, () -> testFilmController.updateFilm(testFilm), "id not found");
 
         actual.setDuration(-1);
@@ -105,7 +113,7 @@ public class FilmControllerTest {
 
         assertEquals(1, testFilmController.getFilms().size(), "Wrong size of returning films array");
 
-        testFilm.setId(1);
+        testFilm.setId(1L);
         Film actual = testFilmController.getFilms().get(0);
         assertEquals(testFilm, actual, "Returning film doesn't match added one");
     }

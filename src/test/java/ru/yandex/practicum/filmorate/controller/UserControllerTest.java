@@ -7,6 +7,9 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -23,7 +26,9 @@ public class UserControllerTest {
         testUser.setEmail("mail@example.com");
         testUser.setBirthday(LocalDate.of(2000, 1, 1));
 
-        testUserController = new UserController();
+        UserStorage testUserStorage = new InMemoryUserStorage();
+        UserService testUserService = new UserService(testUserStorage);
+        testUserController = new UserController(testUserStorage, testUserService);
     }
 
     @Test
@@ -32,17 +37,17 @@ public class UserControllerTest {
         assertEquals(1, actual.getId(), "User object doesn't get id from userController");
 
         // existing id
-        testUser.setId(1);
+        testUser.setId(1L);
         assertThrows(BadRequestException.class, () -> testUserController.addUser(testUser), "id already exist");
 
         // name validation test
-        testUser.setId(0);
+        testUser.setId(0L);
         testUser.setName("");
         actual = testUserController.addUser(testUser);
         assertEquals("userlogin", actual.getName(), "empty username");
 
         // login validation test
-        testUser.setId(0);
+        testUser.setId(0L);
         testUser.setName("username");
         testUser.setLogin("");
         assertThrows(ValidationException.class, () -> testUserController.addUser(testUser), "empty login");
@@ -70,7 +75,7 @@ public class UserControllerTest {
         // success test
         User actualUser = testUserController.addUser(testUser);
 
-        testUser.setId(1);
+        testUser.setId(1L);
         assertEquals(actualUser, testUser, "Added film objects doesn't match");
 
         testUser.setName("newname");
@@ -82,11 +87,11 @@ public class UserControllerTest {
         assertEquals(testUser, actual, "Updated user objects doesn't match");
 
         // unknown id
-        actual.setId(2);
+        actual.setId(2L);
         assertThrows(NotFoundException.class, () -> testUserController.updateUser(actual), "unknown id");
 
         // name validation test
-        actual.setId(1);
+        actual.setId(1L);
         actual.setName("");
         String actualName = testUserController.updateUser(actual).getName();
         assertEquals(actual.getLogin(), actualName, "empty username");
@@ -119,7 +124,7 @@ public class UserControllerTest {
 
         assertEquals(1, testUserController.getUsers().size(), "Wrong size of returning users array");
 
-        testUser.setId(1);
+        testUser.setId(1L);
         User actual = testUserController.getUsers().get(0);
         assertEquals(testUser, actual, "Returning user doesn't match added one");
     }
