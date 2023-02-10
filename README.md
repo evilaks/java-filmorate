@@ -33,26 +33,19 @@ LIMIT 10;
 
 #### Получение общих друзей пользователей с id=1 и с id=2
 ```SQL
-SELECT friend
-FROM (SELECT user_id user,
-               friend_id friend
-        FROM friendship_requests fr1
-        WHERE user_id = 1 AND is_approved = 'TRUE'
-        UNION 
-        SELECT friend_id user,
-               user_id friend
-        FROM friendship_requests fr2
-        WHERE friend_id = 1 AND is_approved = 'TRUE'
-        UNION
-        SELECT user_id user,
-               friend_id friend
-        FROM friendship_requests fr1
-        WHERE user_id = 2 AND is_approved = 'TRUE'
-        UNION 
-        SELECT friend_id user,
-               user_id friend
-        FROM friendship_requests fr2
-        WHERE friend_id = 2 AND is_approved = 'TRUE') friends
-WHERE user = 1 AND user = 2
-GROUP BY friend;
+(SELECT friend_id friend
+ FROM friendship_requests fr1
+ WHERE user_id = 1 AND is_approved = 'TRUE'
+ UNION 
+ SELECT user_id friend
+ FROM friendship_requests fr2
+ WHERE friend_id = 1 AND is_approved = 'TRUE') 
+INTERSECT
+ (SELECT friend_id friend
+  FROM friendship_requests fr1
+  WHERE user_id = 2 AND is_approved = 'TRUE'
+  UNION 
+  SELECT user_id friend
+  FROM friendship_requests fr2
+  WHERE friend_id = 2 AND is_approved = 'TRUE')
 ```
