@@ -14,6 +14,14 @@ SELECT *
 FROM users;
 ```
 
+#### Получение всех друзей пользователя с id=1
+```SQL
+SELECT u.name, fr.status
+FROM friendship_requests fr
+JOIN users u ON fr.friend_id = u.id
+WHERE fr.user_id = 1;
+```
+
 #### Получение всех фильмов
 ```SQL
 SELECT * 
