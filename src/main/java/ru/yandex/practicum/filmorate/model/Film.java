@@ -20,6 +20,8 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> likes = new HashSet<>();
+    private int rating;
+    private Set<Integer> genres;
 
     public Film addLike(long userId) {
         likes.add(userId);
