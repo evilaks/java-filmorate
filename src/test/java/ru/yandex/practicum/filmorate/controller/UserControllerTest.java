@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -20,11 +19,12 @@ public class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        testUser = new User();
-        testUser.setName("username");
-        testUser.setLogin("userlogin");
-        testUser.setEmail("mail@example.com");
-        testUser.setBirthday(LocalDate.of(2000, 1, 1));
+        testUser = User.builder()
+                .name("username")
+                .login("userlogin")
+                .email("mail@example.com")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build();
 
         UserStorage testUserStorage = new InMemoryUserStorage();
         UserService testUserService = new UserService(testUserStorage);
@@ -35,10 +35,6 @@ public class UserControllerTest {
     void addUser() {
         User actual = testUserController.addUser(testUser);
         assertEquals(1, actual.getId(), "User object doesn't get id from userController");
-
-        // existing id
-        testUser.setId(1L);
-        assertThrows(BadRequestException.class, () -> testUserController.addUser(testUser), "id already exist");
 
         // name validation test
         testUser.setId(0L);

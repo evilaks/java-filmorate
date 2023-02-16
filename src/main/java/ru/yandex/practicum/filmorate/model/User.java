@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class User {
     private Long id;
     @Email
@@ -18,7 +20,8 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+    @Singular
+    private Set<Long> friends;
 
     public User normalize() {
         if (this.name == null || this.name.isBlank()) this.name = this.login;
@@ -38,4 +41,5 @@ public class User {
         }
         return this;
     }
+
 }

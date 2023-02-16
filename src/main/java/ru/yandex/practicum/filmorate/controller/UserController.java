@@ -21,44 +21,50 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getUsers() {
+        log.debug("Received GET-request at /users endpoint");
         return userStorage.getAll();
     }
 
     @PostMapping("/users")
     public User addUser(@RequestBody @Valid User user) {
         log.debug("Received POST-request at /users endpoint with User object: {}", user.toString());
-        return userStorage.add(user);
+        return userService.addUser(user);
     }
 
     @PutMapping("/users")
     public User updateUser(@RequestBody @Valid User user) {
         log.debug("Received PUT-request at /users endpoint with User-object {}", user.toString());
-        return userStorage.update(user);
+        return userService.updateUser(user);
     }
 
     @GetMapping("/users/{userId}")
     public User getUser(@PathVariable("userId") Long userId) {
-        return userStorage.get(userId);
+        log.debug("Received GET-request at /users/{} endpoint", userId);
+        return userService.getUser(userId);
     }
 
     @GetMapping("/users/{userId}/friends")
     public List<User> getUserFriends(@PathVariable("userId") Long userId) {
-        return userService.getFreindsList(userStorage.get(userId));
+        log.debug("Received GET-request at /users/{}/friends endpoint", userId);
+        return userService.getFreindsList(userService.getUser(userId));
     }
 
     @PutMapping("/users/{userId}/friends/{friendId}")
     public User addFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
-        return userService.addFriend(userStorage.get(userId), friendId);
+        log.debug("Received PUT-request at /users/{}/friends/{} endpoint", userId, friendId);
+        return userService.addFriend(userService.getUser(userId), friendId);
     }
 
     @DeleteMapping("/users/{userId}/friends/{friendId}")
     public User removeFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
-        return userService.removeFriend(userStorage.get(userId), friendId);
+        log.debug("Received DELETE-request at /users/{}/friends/{} endpoint", userId, friendId);
+        return userService.removeFriend(userService.getUser(userId), friendId);
     }
 
     @GetMapping("/users/{userId}/friends/common/{otherId}")
     public List<User> getMutualFriends(@PathVariable("userId") Long userId, @PathVariable("otherId") Long otherId) {
-        return userService.getMutualFriends(userStorage.get(userId), userStorage.get(otherId));
+        log.debug("Received GET-request at /users/{}/friends/common/{} endpoint", userId, otherId);
+        return userService.getMutualFriends(userService.getUser(userId), userService.getUser(otherId));
     }
 
 }

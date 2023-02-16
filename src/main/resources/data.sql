@@ -1,31 +1,43 @@
--- add users
-INSERT INTO "users" ("name", "login", "email", "birthday") VALUES ('user1', 'login1', 'email1@example.com', '2000-01-01');
-INSERT INTO "users" ("name", "login", "email", "birthday") VALUES ('user2', 'login2', 'email2@example.com', '1999-01-01');
-INSERT INTO "users" ("name", "login", "email", "birthday") VALUES ('user3', 'login3', 'email3@example.com', '1998-01-01');
+-- add USERS
+INSERT INTO USERS (NAME, LOGIN, EMAIL, BIRTHDAY) VALUES ('user1', 'login1', 'email1@example.com', '2000-01-01');
+INSERT INTO USERS (NAME, LOGIN, EMAIL, BIRTHDAY) VALUES ('user2', 'login2', 'email2@example.com', '1999-01-01');
+INSERT INTO USERS (NAME, LOGIN, EMAIL, BIRTHDAY) VALUES ('user3', 'login3', 'email3@example.com', '1998-01-01');
 --add friendship
-INSERT INTO "friendship_requests" ("user_id", "friend_id", "is_approved") VALUES (1, 2, 'TRUE');
-INSERT INTO "friendship_requests" ("user_id", "friend_id", "is_approved") VALUES (2, 3, 'FALSE');
-INSERT INTO "friendship_requests" ("user_id", "friend_id", "is_approved") VALUES (3, 1, 'TRUE');
--- add genres
-INSERT INTO "genre" ("name") VALUES ('comedy');
-INSERT INTO "genre" ("name") VALUES ('drama');
-INSERT INTO "genre" ("name") VALUES ('anime');
--- add ratings
-INSERT INTO "rating" ("name") VALUES ('G');
-INSERT INTO "rating" ("name") VALUES ('PG');
-INSERT INTO "rating" ("name") VALUES ('PG-13');
-INSERT INTO "rating" ("name") VALUES ('R');
-INSERT INTO "rating" ("name") VALUES ('NC-17');
--- add films data
-INSERT INTO "films"  ("title", "description" , "release_date", "duration", "rating_id")
+INSERT INTO FRIENDSHIP_REQUESTS (USER_ID, FRIEND_ID, IS_APPROVED) VALUES (1, 2, 'TRUE');
+INSERT INTO FRIENDSHIP_REQUESTS (USER_ID, FRIEND_ID, IS_APPROVED) VALUES (2, 3, 'FALSE');
+INSERT INTO FRIENDSHIP_REQUESTS (USER_ID, FRIEND_ID, IS_APPROVED) VALUES (3, 1, 'TRUE');
+-- ADD GENRES
+INSERT INTO GENRE (NAME) VALUES ('comedy');
+INSERT INTO GENRE (NAME) VALUES ('drama');
+INSERT INTO GENRE (NAME) VALUES ('anime');
+-- ADD RATINGS
+INSERT INTO RATING (NAME) VALUES ('G');
+INSERT INTO RATING (NAME) VALUES ('PG');
+INSERT INTO RATING (NAME) VALUES ('PG-13');
+INSERT INTO RATING (NAME) VALUES ('R');
+INSERT INTO RATING (NAME) VALUES ('NC-17');
+-- ADD FILMS DATA
+INSERT INTO FILMS  (TITLE, DESCRIPTION , RELEASE_DATE, DURATION, RATING_ID)
 VALUES ('film1', 'description1', '2000-01-01', 120, 1);
-INSERT INTO "films"  ("title", "description" , "release_date", "duration", "rating_id")
+INSERT INTO FILMS  (TITLE, DESCRIPTION , RELEASE_DATE, DURATION, RATING_ID)
 VALUES ('film2', 'description2', '2000-01-01', 180, 2);
-INSERT INTO "films"  ("title", "description" , "release_date", "duration", "rating_id")
+INSERT INTO FILMS  (TITLE, DESCRIPTION , RELEASE_DATE, DURATION, RATING_ID)
 VALUES ('film3', 'description3', '2000-01-01', 240, 3);
--- add genres to films
-INSERT INTO "film_genre" ("film_id", "genre_id") VALUES (1, 1);
-INSERT INTO "film_genre" ("film_id", "genre_id") VALUES (1, 3);
-INSERT INTO "film_genre" ("film_id", "genre_id") VALUES (2, 2);
-INSERT INTO "film_genre" ("film_id", "genre_id") VALUES (3, 2);
-INSERT INTO "film_genre" ("film_id", "genre_id") VALUES (3, 1);
+-- ADD GENRES TO FILMS
+INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (1, 1);
+INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (1, 3);
+INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (2, 2);
+INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (3, 2);
+INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (3, 1);
+-- DELETE ALL
+DELETE FROM FRIENDSHIP_REQUESTS;
+DELETE FROM LIKES;
+DELETE FROM FILM_GENRE;
+DELETE FROM USERS;
+ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1;
+DELETE FROM FILMS;
+ALTER TABLE FILMS ALTER COLUMN ID RESTART WITH 1;
+DELETE FROM GENRE;
+ALTER TABLE GENRE ALTER COLUMN ID RESTART WITH 1;
+DELETE FROM RATING;
+ALTER TABLE RATING ALTER COLUMN ID RESTART WITH 1;
