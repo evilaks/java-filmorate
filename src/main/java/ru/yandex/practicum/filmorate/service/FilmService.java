@@ -7,10 +7,13 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,14 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
+    private final GenreService genreService;
+
+    public List<Film> getAllFilms() {
+        return filmStorage.getAll()
+                .stream()
+                .sorted((f1, f2) -> Math.toIntExact((f1.getId() - f2.getId())))
+                .collect(Collectors.toList());
+    }
 
     public Film getFilm(long filmId) {
         if (filmStorage.get(filmId) == null) {
@@ -32,18 +43,18 @@ public class FilmService {
         if (isInvalidFilm(film)) {
             throw new ValidationException("Invalid film-object received");
         }
-        return filmStorage.add(film);
+        return filmStorage.add(this.normalizeGenresInFilm(film));
     }
 
     public Film updateFilm(Film film) {
         if (isInvalidFilm(film)) {
             throw new ValidationException("Invalid user properties");
-        } else if (filmStorage.get(film.getId()) != null) {
-            filmStorage.update(film);
-        } else {
+        } else if (filmStorage.get(film.getId()) == null) {
             throw new NotFoundException("Film with such id not found");
+        } else {
+            return filmStorage.update(this.normalizeGenresInFilm(film));
         }
-        return film;
+
     }
 
     public Film addLike(Long filmId, Long userId) {
@@ -78,6 +89,13 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
+    private Film normalizeGenresInFilm(Film film) {
+        if (film.getGenres() != null) {
+            film.setGenres(new ArrayList<>(new HashSet<>(film.getGenres())));
+        }
+        return film;
+    }
+
     private boolean isInvalidFilm(Film film) {
         if (film.getName().isBlank()) {
             log.debug("Invalid Film-object: filmName is blank");
@@ -94,6 +112,13 @@ public class FilmService {
         if (film.getDuration() <= 0) {
             log.debug("Invalid Film-object: duration is <= 0");
             return true;
+        }
+        if (film.getGenres() != null) {
+            for(Genre genre : film.getGenres()) {
+                if (genreService.getGenre(genre.getId()) == null) {
+                    return true;
+                }
+            }
         }
         return false;
     }

@@ -21,7 +21,7 @@ public class Film {
     private Integer duration;
     private final Set<Long> likes = new HashSet<>();
     private Rating mpa;
-    private Set<Integer> genres;
+    private List<Genre> genres;
 
 
     public Film addLike(long userId) {

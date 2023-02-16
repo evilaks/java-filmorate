@@ -8,10 +8,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +25,7 @@ public class DbFilmStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final RatingStorage ratingStorage;
+    private final GenreStorage genreStorage;
 
     @Override
     public Film add(Film film) {
@@ -41,21 +45,39 @@ public class DbFilmStorage implements FilmStorage {
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         film.setId(id);
 
-        return film;
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                String sql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+                jdbcTemplate.update(sql, film.getId(), genre.getId());
+            }
+        }
+
+        return this.get(film.getId());
     }
 
     @Override
     public List<Film> getAll() {
-        log.debug("Extracting all users from the database");
-        String sql = "SELECT * FROM FILMS";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> createFilm(rs));
+        log.debug("Extracting all films from the database");
+        String sql = "SELECT id FROM FILMS ORDER BY id DESC";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("id")));
     }
 
     @Override
     public Film get(long id) {
         log.debug("Extracting film with id={} from the database", id);
         String sql = "SELECT * FROM FILMS WHERE ID=?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> createFilm(rs), id).stream().findFirst().orElse(null);
+        Film film = jdbcTemplate.query(sql, (rs, rowNum) -> createFilm(rs), id)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (film != null) {
+            String requestGenres = "SELECT genre_id FROM film_genre WHERE film_id=?";
+            List<Genre> filmGenres = new ArrayList<>(jdbcTemplate.query(requestGenres, (rs, rowNum) -> extractGenre(rs), id));
+            film.setGenres(filmGenres);
+        }
+
+        return film;
     }
 
     @Override
@@ -71,7 +93,16 @@ public class DbFilmStorage implements FilmStorage {
                 film.getReleaseDate(),
                 film.getMpa().getId(),
                 film.getId());
-        return film;
+
+        if (film.getGenres() != null) {
+            String deleteQuery = "DELETE FROM film_genre WHERE film_id=?";
+            jdbcTemplate.update(deleteQuery, film.getId());
+            for (Genre genre : film.getGenres()) {
+                String insertQuery = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+                jdbcTemplate.update(insertQuery, film.getId(), genre.getId());
+            }
+        }
+        return this.get(film.getId());
     }
 
     @Override
@@ -79,7 +110,7 @@ public class DbFilmStorage implements FilmStorage {
         log.debug("Deleting film with id={} from the database [NOT IMPLEMENTED]", film.getId());
     }
 
-    public Film createFilm(ResultSet rs) throws SQLException {
+    private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("title"))
@@ -88,5 +119,9 @@ public class DbFilmStorage implements FilmStorage {
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .mpa(ratingStorage.get(rs.getInt("rating_id")))
                 .build();
+    }
+
+    private Genre extractGenre(ResultSet rs) throws SQLException {
+        return genreStorage.get(rs.getInt("genre_id"));
     }
 }
