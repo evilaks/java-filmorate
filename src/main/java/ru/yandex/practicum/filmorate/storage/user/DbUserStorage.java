@@ -77,6 +77,34 @@ public class DbUserStorage implements UserStorage {
         log.debug("Deleting user with id={} from the database [NOT IMPLEMENTED]", user.getId());
     }
 
+    @Override
+    public User addFriend(User user, long friendId) {
+        log.debug("Adding a new friend with id={} to the user with id={}", friendId, user.getId());
+
+        String sql = "INSERT INTO FRIENDSHIP_REQUESTS (USER_ID, FRIEND_ID, IS_APPROVED)" +
+                "VALUES (?, ?, ?)";
+
+        jdbcTemplate.update(sql, user.getId(), friendId, Boolean.FALSE);
+
+        return user;
+    }
+
+    @Override
+    public List<User> getFriends(User user) {
+        log.debug("Extracting a friends list from the database for the user with id={}", user.getId());
+
+        String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDSHIP_REQUESTS WHERE USER_ID=?)";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> createUser(rs), user.getId());
+    }
+
+    @Override
+    public User removeFriend(User user, long friendId) {
+        log.debug("Removing a friend with id={} the from friendlist of a user with id={}", friendId, user.getId());
+        String sql = "DELETE FROM FRIENDSHIP_REQUESTS WHERE USER_ID=? AND FRIEND_ID=?";
+        jdbcTemplate.update(sql, user.getId(), friendId);
+        return user;
+    }
+
     private User createUser(ResultSet rs) throws SQLException {
 
         return User.builder()

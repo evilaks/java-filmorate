@@ -50,31 +50,42 @@ public class UserService {
     }
 
     public User addFriend(User user, long friendId) {
-        User friend = userStorage.get(friendId);
-        friend.addFriend(user.getId());
-        userStorage.update(friend);
-        return userStorage.update(user.addFriend(friendId));
+        if (userStorage.get(user.getId()) == null) {
+            throw new NotFoundException("User not found");
+        } else if (userStorage.get(friendId) == null) {
+            throw new NotFoundException("Friend not found");
+        } else {
+            return userStorage.addFriend(user, friendId);
+        }
     }
 
     public User removeFriend(User user, long friendId) {
-        User friend = userStorage.get(friendId);
-        friend.removeFriend(user.getId());
-        userStorage.update(friend);
-        return userStorage.update(user.removeFriend(friendId));
+        if (userStorage.get(user.getId()) == null) {
+            throw new NotFoundException("User not found");
+        } else if (userStorage.get(friendId) == null) {
+            throw new NotFoundException("Friend not found");
+        } else {
+            return userStorage.removeFriend(user, friendId);
+        }
     }
 
     public List<User> getFreindsList(User user) {
-        List<User> friendsList = new ArrayList<>();
-        Set<Long> friendsIds = user.getFriends();
-        for (Long id : friendsIds) {
-            friendsList.add(userStorage.get(id));
+        if (userStorage.get(user.getId()) == null) {
+            throw new NotFoundException("User not found");
+        } else {
+            return userStorage.getFriends(user);
         }
-        return friendsList;
     }
 
     public List<User> getMutualFriends(User actualUser, User targetUser) {
-        Set<Long> actualUserFriends = actualUser.getFriends();
-        Set<Long> targetUserFriends = targetUser.getFriends();
+        Set<Long> actualUserFriends = userStorage.getFriends(actualUser)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        Set<Long> targetUserFriends = userStorage.getFriends(targetUser)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
         Set<Long> mutualFriendsIds = actualUserFriends.stream()
                 .filter(targetUserFriends::contains)
                 .collect(Collectors.toSet());

@@ -46,4 +46,22 @@ public class InMemoryUserStorage implements UserStorage {
         log.debug("Unimplemented \"remove\" method called");
     }
 
+    @Override
+    public User addFriend(User user, long friendId) {
+        log.debug("Method \"addFriend\" not implemented in InMemoryUserStorage");
+        return null;
+    }
+
+    @Override
+    public List<User> getFriends(User user) {
+        log.debug("Method \"getFriends\" not implemented in InMemoryUserStorage");
+        return null;
+    }
+
+    @Override
+    public User removeFriend(User user, long friendId) {
+        log.debug("Method \"removeFriend\" not implemented in InMemoryUserStorage");
+        return null;
+    }
+
 }
