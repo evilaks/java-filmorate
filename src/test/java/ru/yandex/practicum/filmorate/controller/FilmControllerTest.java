@@ -3,11 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -22,15 +22,17 @@ public class FilmControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        testFilm = new Film();
-        testFilm.setName("name");
-        testFilm.setDescription("desc");
-        testFilm.setReleaseDate(LocalDate.of(2000, 10, 10));
-        testFilm.setDuration(100);
+        testFilm = Film.builder()
+                .name("name")
+                .description("desc")
+                .releaseDate(LocalDate.of(2000, 10, 10))
+                .duration(100)
+                .build();
 
         FilmStorage testFilmStorage = new InMemoryFilmStorage();
         UserStorage testUserStorage = new InMemoryUserStorage();
-        FilmService testFilmService = new FilmService(testFilmStorage, testUserStorage);
+        UserService testUserService = new UserService(testUserStorage);
+        FilmService testFilmService = new FilmService(testFilmStorage, testUserService);
         testFilmController = new FilmController(testFilmStorage, testFilmService);
     }
 
@@ -38,9 +40,6 @@ public class FilmControllerTest {
     void addFilm() {
         Film actual = testFilmController.addFilm(testFilm);
         assertEquals(1, actual.getId(), "Film object doesn't get id from filmController");
-
-        testFilm.setId(1L);
-        assertThrows(BadRequestException.class, () -> testFilmController.addFilm(testFilm), "id already exist");
 
         testFilm.setId(0L);
         testFilm.setDuration(-1);

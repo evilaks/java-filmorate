@@ -26,18 +26,18 @@ public class FilmController {
 
     @GetMapping("/films/{filmId}")
     public Film getFilm(@PathVariable("filmId") Long filmId) {
-        return filmStorage.get(filmId);
+        return filmService.getFilm(filmId);
     }
 
     @PostMapping("/films")
     public Film addFilm(@RequestBody @Valid Film film) {
-        return filmStorage.add(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping("/films")
     public Film updateFilm(@RequestBody @Valid Film film) {
         log.debug("Received PUT-request at /films endpoint with Film-object {}", film.toString());
-        return filmStorage.update(film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/films/{filmId}/like/{userId}")

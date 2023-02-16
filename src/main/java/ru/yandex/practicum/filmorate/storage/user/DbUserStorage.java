@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
-@Component
+@Repository
 @RequiredArgsConstructor
 @Primary
 public class DbUserStorage implements UserStorage {
@@ -59,10 +59,10 @@ public class DbUserStorage implements UserStorage {
     public User update(User user) {
         log.debug("Updating user with id={} in the database", user.getId());
 
-        String sqlQuery = "UPDATE USERS SET " +
+        String sql = "UPDATE USERS SET " +
                 "NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ? " +
                 "WHERE id = ?";
-        jdbcTemplate.update(sqlQuery,
+        jdbcTemplate.update(sql,
                     user.getName(),
                     user.getLogin(),
                     user.getEmail(),
