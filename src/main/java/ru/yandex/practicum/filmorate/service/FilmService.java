@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,35 +57,29 @@ public class FilmService {
     }
 
     public Film addLike(Long filmId, Long userId) {
-        Film film = filmStorage.get(filmId);
+        Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
         userService.getUser(userId); // check if user exist, else throw 404
 
-        if (!film.getLikes().contains(userId)) {
-            film.addLike(userId);
-            filmStorage.update(film);
+        if (!filmStorage.getLikes(film).contains(userId)) {
+            filmStorage.addLike(film, userId);
         } else throw new BadRequestException("The film has already got like from user " + userId);
 
         return film;
     }
 
     public Film removeLike(Long filmId, Long userId) {
-        Film film = filmStorage.get(filmId);
+        Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
         userService.getUser(userId); // check if user exist, else throw 404
 
-        if (film.getLikes().contains(userId)) {
-            film.removeLike(userId);
-            filmStorage.update(film);
+        if (filmStorage.getLikes(film).contains(userId)) {
+            filmStorage.removeLike(film, userId);
         } else throw new NotFoundException("Film has no like from user " + userId);
 
         return film;
     }
 
     public List<Film> getPopularFilms(int count) {
-        Comparator<Film> filmComparator = (f1, f2) -> f2.getLikes().size() - f1.getLikes().size();
-        return filmStorage.getAll().stream()
-                .sorted(filmComparator)
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms(count);
     }
 
     private Film normalizeGenresInFilm(Film film) {

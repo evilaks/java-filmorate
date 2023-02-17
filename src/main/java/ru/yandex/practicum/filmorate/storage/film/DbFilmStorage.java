@@ -110,6 +110,41 @@ public class DbFilmStorage implements FilmStorage {
         log.debug("Deleting film with id={} from the database [NOT IMPLEMENTED]", film.getId());
     }
 
+    @Override
+    public void addLike(Film film, long userId) {
+        log.debug("Adding like to film with id={} from user with id={}", film.getId(), userId);
+        String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, film.getId(), userId);
+    }
+
+    @Override
+    public List<Long> getLikes(Film film) {
+        log.debug("Extracting likes of film with id={}", film.getId());
+        String sql = "SELECT user_id FROM likes WHERE film_id=?";
+        return new ArrayList<>(jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), film.getId()));
+    }
+
+    @Override
+    public void removeLike(Film film, long userId) {
+        log.debug("Removing like from film with id={} from user with id={}", film.getId(), userId);
+        String sql = "DELETE FROM likes WHERE film_id=? AND user_id=?";
+        jdbcTemplate.update(sql, film.getId(), userId);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        log.debug("Extracting {} popular films from the database", count);
+        String sql = "SELECT FILM_ID \n" +
+                "FROM (\n" +
+                "\tSELECT f.ID film_id, COUNT(l.USER_ID) likes_count \n" +
+                "\tFROM FILMS f \n" +
+                "\tLEFT JOIN LIKES l ON f.ID=l.FILM_ID \n" +
+                "\tGROUP BY f.ID\n" +
+                "\tORDER BY likes_count DESC) AS POPULAR\n" +
+                "\tLIMIT ?;";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), count);
+    }
+
     private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("id"))

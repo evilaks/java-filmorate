@@ -52,7 +52,10 @@ public class DbUserStorage implements UserStorage {
     public User get(long id) {
         log.debug("Extracting user with id={} from the database", id);
         String sql = "SELECT * FROM USERS WHERE ID=?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> createUser(rs), id).stream().findFirst().orElse(null);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> createUser(rs), id)
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
