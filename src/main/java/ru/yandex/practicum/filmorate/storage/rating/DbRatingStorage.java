@@ -27,7 +27,7 @@ public class DbRatingStorage implements RatingStorage {
     @Override
     public List<Rating> getAll() {
         log.debug("Extracting all mpa ratings from the database");
-        String sql = "SELECT * FROM RATING";
+        String sql = "SELECT * FROM RATING ORDER BY ID";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createMpa(rs));
     }
 

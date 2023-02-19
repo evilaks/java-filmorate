@@ -26,7 +26,7 @@ public class DbGenreStorage implements GenreStorage {
     @Override
     public List<Genre> getAll() {
         log.debug("Extracting all genres from the database");
-        String sql = "SELECT * FROM GENRE";
+        String sql = "SELECT * FROM GENRE ORDER BY ID";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createGenre(rs));
     }
 
