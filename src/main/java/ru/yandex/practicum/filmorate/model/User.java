@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Data
+@Builder
 public class User {
     private Long id;
     @Email
@@ -17,25 +18,12 @@ public class User {
     @NotBlank
     private String login;
     private String name;
+    @NotNull
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
 
     public User normalize() {
         if (this.name == null || this.name.isBlank()) this.name = this.login;
         return this;
     }
 
-    public User addFriend(long friendId) {
-        this.friends.add(friendId);
-        return this;
-    }
-
-    public User removeFriend(long friendId) {
-        if (friends.contains(friendId)) {
-            friends.remove(friendId);
-        } else {
-            throw new NotFoundException("Friend not found");
-        }
-        return this;
-    }
 }

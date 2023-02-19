@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,33 +15,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmController {
 
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @GetMapping("/films")
     public List<Film> getFilms() {
-        return filmStorage.getAll();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/films/{filmId}")
     public Film getFilm(@PathVariable("filmId") Long filmId) {
-        return filmStorage.get(filmId);
+        return filmService.getFilm(filmId);
     }
 
     @PostMapping("/films")
     public Film addFilm(@RequestBody @Valid Film film) {
-        return filmStorage.add(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping("/films")
     public Film updateFilm(@RequestBody @Valid Film film) {
         log.debug("Received PUT-request at /films endpoint with Film-object {}", film.toString());
-        return filmStorage.update(film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/films/{filmId}/like/{userId}")
     public Film addLike(@PathVariable("filmId") Long filmId, @PathVariable("userId") Long userId) {
         return filmService.addLike(filmId, userId);
+    }
+
+    @GetMapping("/films/{filmId}/likes")
+    public List<Long> getFilmLikes(@PathVariable("filmId") Long filmId) {
+        return filmService.getLikesByFilm(filmId);
     }
 
     @DeleteMapping("/films/{filmId}/like/{userId}")
