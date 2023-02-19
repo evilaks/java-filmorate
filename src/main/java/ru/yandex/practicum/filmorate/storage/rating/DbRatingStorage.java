@@ -18,7 +18,7 @@ public class DbRatingStorage implements RatingStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Rating get(int id) {
+    public Rating get(long id) {
         log.debug("Extracting mpa rating with id={} from the database", id);
         String sql = "SELECT * FROM RATING WHERE ID=?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createMpa(rs), id).stream().findFirst().orElse(null);
@@ -33,7 +33,7 @@ public class DbRatingStorage implements RatingStorage {
 
     private Rating createMpa(ResultSet rs) throws SQLException {
         return Rating.builder()
-                .id(rs.getInt("id"))
+                .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .build();
     }

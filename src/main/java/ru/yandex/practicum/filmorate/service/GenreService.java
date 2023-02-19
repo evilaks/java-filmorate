@@ -14,7 +14,7 @@ public class GenreService {
 
     private final GenreStorage genreStorage;
 
-    public Genre getGenre(int id) {
+    public Genre getGenre(long id) {
         Genre genre = genreStorage.get(id);
         if (genre == null) {
             throw new NotFoundException("MPA rating with id=" + id + " not found");

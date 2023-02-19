@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 public class RatingService {
     private final RatingStorage ratingStorage;
 
-    public Rating getRating(int id) {
+    public Rating getRating(long id) {
         Rating mpaRating = ratingStorage.get(id);
         if (mpaRating == null) {
             throw new NotFoundException("MPA rating with id=" + id + " not found");

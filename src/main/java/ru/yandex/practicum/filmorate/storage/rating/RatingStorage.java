@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import java.util.List;
 
 public interface RatingStorage {
-    Rating get(int id);
+    Rating get(long id);
 
     List<Rating> getAll();
 }

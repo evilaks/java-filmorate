@@ -17,7 +17,7 @@ public class DbGenreStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Genre get(int id) {
+    public Genre get(Long id) {
         log.debug("Extracting genre with id={} from the database", id);
         String sql = "SELECT * FROM GENRE WHERE ID=?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createGenre(rs), id).stream().findFirst().orElse(null);
@@ -32,7 +32,7 @@ public class DbGenreStorage implements GenreStorage {
 
     private Genre createGenre(ResultSet rs) throws SQLException {
         return Genre.builder()
-                .id(rs.getInt("id"))
+                .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .build();
     }

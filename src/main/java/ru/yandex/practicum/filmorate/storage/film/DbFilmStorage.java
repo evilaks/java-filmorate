@@ -174,6 +174,6 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     private Genre extractGenre(ResultSet rs) throws SQLException {
-        return genreStorage.get(rs.getInt("genre_id"));
+        return genreStorage.get(rs.getLong("genre_id"));
     }
 }

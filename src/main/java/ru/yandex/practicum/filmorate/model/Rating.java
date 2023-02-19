@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class Rating {
-    private int id;
+    private Long id;
     private String name;
 }

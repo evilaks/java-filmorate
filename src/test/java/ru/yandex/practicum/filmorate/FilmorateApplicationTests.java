@@ -247,8 +247,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1999, 11, 1))
-				.mpa(ratingController.getMpa(2))
-				.genres(List.of(genreController.getGenre(2)))
+				.mpa(ratingController.getMpa(2L))
+				.genres(List.of(genreController.getGenre(2L)))
 				.id(1L)
 				.build();
 
@@ -271,8 +271,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1000, 11, 1))
-				.mpa(ratingController.getMpa(2))
-				.genres(List.of(genreController.getGenre(2)))
+				.mpa(ratingController.getMpa(2L))
+				.genres(List.of(genreController.getGenre(2L)))
 				.id(1L)
 				.build()), "wrong release date");
 
@@ -281,8 +281,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1999, 11, 1))
-				.mpa(ratingController.getMpa(2))
-				.genres(List.of(genreController.getGenre(2)))
+				.mpa(ratingController.getMpa(2L))
+				.genres(List.of(genreController.getGenre(2L)))
 				.id(1L)
 				.build()), "empty name");
 
@@ -291,8 +291,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1999, 11, 1))
-				.mpa(ratingController.getMpa(9999))
-				.genres(List.of(genreController.getGenre(2)))
+				.mpa(ratingController.getMpa(9999L))
+				.genres(List.of(genreController.getGenre(2L)))
 				.id(1L)
 				.build()), "unknown rating");
 
@@ -301,8 +301,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1999, 11, 1))
-				.mpa(ratingController.getMpa(2))
-				.genres(List.of(genreController.getGenre(9999)))
+				.mpa(ratingController.getMpa(2L))
+				.genres(List.of(genreController.getGenre(9999L)))
 				.id(1L)
 				.build()), "unknown genre");
 	}
@@ -349,8 +349,8 @@ class FilmorateApplicationTests {
 				.description("updated description")
 				.duration(200)
 				.releaseDate(LocalDate.of(1999, 11, 1))
-				.mpa(ratingController.getMpa(2))
-				.genres(List.of(genreController.getGenre(2)))
+				.mpa(ratingController.getMpa(2L))
+				.genres(List.of(genreController.getGenre(2L)))
 				.id(9999L)
 				.build()), "unknown film");
 	}
@@ -361,7 +361,7 @@ class FilmorateApplicationTests {
 		List<Genre> genres = genreController.getAllGenres();
 
 		assertThat(genres).isNotEmpty();
-		assertThat(genres).contains(genreController.getGenre(1));
+		assertThat(genres).contains(genreController.getGenre(1L));
 	}
 
 	// mpa ratings test
@@ -370,7 +370,7 @@ class FilmorateApplicationTests {
 		List<Rating> ratings = ratingController.getAllMpa();
 
 		assertThat(ratings).isNotEmpty();
-		assertThat(ratings).contains(ratingController.getMpa(1));
+		assertThat(ratings).contains(ratingController.getMpa(1L));
 	}
 
 
@@ -380,8 +380,8 @@ class FilmorateApplicationTests {
 				.description("new description")
 				.duration(100)
 				.releaseDate(LocalDate.of(2000, 11, 1))
-				.mpa(ratingController.getMpa(1))
-				.genres(List.of(genreController.getGenre(1)))
+				.mpa(ratingController.getMpa(1L))
+				.genres(List.of(genreController.getGenre(1L)))
 				.build();
 	}
 
