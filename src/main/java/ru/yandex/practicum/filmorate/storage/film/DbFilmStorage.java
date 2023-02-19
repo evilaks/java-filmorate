@@ -111,6 +111,15 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void deleteAll() {
+        log.debug("Deleting all film data from the database");
+        jdbcTemplate.update("DELETE from LIKES");
+        jdbcTemplate.update("DELETE from FILM_GENRE");
+        jdbcTemplate.update("DELETE from FILMS");
+        jdbcTemplate.update("ALTER TABLE FILMS ALTER COLUMN ID RESTART WITH 1;");
+    }
+
+    @Override
     public void addLike(Film film, long userId) {
         log.debug("Adding like to film with id={} from user with id={}", film.getId(), userId);
         String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
@@ -143,6 +152,14 @@ public class DbFilmStorage implements FilmStorage {
                 "\tORDER BY likes_count DESC) AS POPULAR\n" +
                 "\tLIMIT ?;";
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), count);
+    }
+
+    @Override
+    public List<Long> getFilmLikes(Film film) {
+        log.debug("Extracting from the database users added likes to film with id={}", film.getId());
+        String sql = "SELECT USER_ID FROM LIKES " +
+                "WHERE FILM_ID=?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
     }
 
     private Film createFilm(ResultSet rs) throws SQLException {

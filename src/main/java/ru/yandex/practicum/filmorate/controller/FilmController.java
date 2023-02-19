@@ -43,6 +43,11 @@ public class FilmController {
         return filmService.addLike(filmId, userId);
     }
 
+    @GetMapping("/films/{filmId}/likes")
+    public List<Long> getFilmLikes(@PathVariable("filmId") Long filmId) {
+        return filmService.getLikesByFilm(filmId);
+    }
+
     @DeleteMapping("/films/{filmId}/like/{userId}")
     public Film removeLike(@PathVariable("filmId") Long filmId, @PathVariable("userId") Long userId) {
         return filmService.removeLike(filmId, userId);

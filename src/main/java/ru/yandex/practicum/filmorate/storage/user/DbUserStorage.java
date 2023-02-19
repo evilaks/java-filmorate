@@ -108,6 +108,15 @@ public class DbUserStorage implements UserStorage {
         return user;
     }
 
+    @Override
+    public void deleteAll() {
+        log.debug("Deleting all data from users");
+        jdbcTemplate.update("DELETE FROM LIKES");
+        jdbcTemplate.update("DELETE FROM FRIENDSHIP_REQUESTS");
+        jdbcTemplate.update("delete from users");
+        jdbcTemplate.update("ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1");
+    }
+
     private User createUser(ResultSet rs) throws SQLException {
 
         return User.builder()

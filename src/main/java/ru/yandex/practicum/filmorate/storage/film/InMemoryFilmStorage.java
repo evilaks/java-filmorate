@@ -47,6 +47,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void deleteAll() {
+        log.debug("Unimplemented \"deleteAll\" method called");
+    }
+
+    @Override
     public void addLike(Film film, long userId) {
         log.debug("Unimplemented \"addLike\" method called");
     }
@@ -65,6 +70,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getPopularFilms(int count) {
         log.debug("Unimplemented \"getPopularFilms\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Long> getFilmLikes(Film film) {
+        log.debug("Unimplemented \"getFilmLikes\" method called");
         return null;
     }
 }

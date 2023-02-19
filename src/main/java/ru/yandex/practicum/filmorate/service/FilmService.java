@@ -67,6 +67,11 @@ public class FilmService {
         return film;
     }
 
+    public List<Long> getLikesByFilm(Long filmId) {
+        Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
+        return filmStorage.getFilmLikes(film);
+    }
+
     public Film removeLike(Long filmId, Long userId) {
         Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
         userService.getUser(userId); // check if user exist, else throw 404
@@ -115,4 +120,5 @@ public class FilmService {
         }
         return false;
     }
+
 }

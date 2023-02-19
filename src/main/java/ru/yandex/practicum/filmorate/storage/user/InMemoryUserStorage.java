@@ -64,4 +64,9 @@ public class InMemoryUserStorage implements UserStorage {
         return null;
     }
 
+    @Override
+    public void deleteAll() {
+        log.debug("Method \"deleteAll\" not implemented in InMemoryUserStorage");
+    }
+
 }

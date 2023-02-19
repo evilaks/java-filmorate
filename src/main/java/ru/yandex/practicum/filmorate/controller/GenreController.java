@@ -19,12 +19,12 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping("/genres")
-    public List<Genre> getAllMpa() {
+    public List<Genre> getAllGenres() {
         return genreStorage.getAll();
     }
 
     @GetMapping("/genres/{id}")
-    public Genre getMpa(@PathVariable("id") int genreId) {
+    public Genre getGenre(@PathVariable("id") int genreId) {
         return genreService.getGenre(genreId);
     }
 }
