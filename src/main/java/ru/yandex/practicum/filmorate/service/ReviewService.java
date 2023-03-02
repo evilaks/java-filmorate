@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,15 @@ public class ReviewService {
         } else {
             return review;
         }
+    }
+
+    public List<Review> getAllReviews(Integer count) {
+        return reviewStorage.getAll(count);
+    }
+
+    public List<Review> getReviewsByFilmId(Integer count, Long filmId) {
+        filmService.getFilm(filmId); // throws 404 if film not found
+        return reviewStorage.findReviewsByFilmId(count, filmId);
     }
 
     private void validateReview(Review review)  {

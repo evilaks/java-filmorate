@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Slf4j
 @Repository
@@ -69,6 +70,20 @@ public class DbReviewStorage implements ReviewStorage {
         // todo count useful
 
         return review;
+    }
+
+    @Override
+    public List<Review> getAll(Integer count) {
+        log.debug("Extracting all reviews from the database");
+        String sql = "SELECT ID FROM REVIEWS ORDER BY ID DESC LIMIT ?"; // todo change order by useful
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("id")), count);
+    }
+
+    @Override
+    public List<Review> findReviewsByFilmId(Integer count, Long filmId) {
+        log.debug("Extracting all reviews from the database for the film with id={}", filmId);
+        String sql = "SELECT ID FROM REVIEWS WHERE FILM_ID=? ORDER BY ID DESC LIMIT ?"; // todo change order by useful
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("id")), filmId, count);
     }
 
     @Override

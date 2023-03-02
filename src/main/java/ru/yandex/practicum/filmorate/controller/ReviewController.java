@@ -7,46 +7,58 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/reviews")
+    @PostMapping()
     public Review addReview(@RequestBody @Valid Review review) {
         log.debug("Received POST-request at \"/reviews\" endpoint with body: {}", review);
         return reviewService.addReview(review);
     }
 
-    @PutMapping("/reviews")
+    @PutMapping()
     public Review updateReview(@RequestBody @Valid Review review) {
         log.debug("Received PUT-request at \"/reviews\" endpoint with body: {}", review);
         return reviewService.updateReview(review);
     }
 
-    @DeleteMapping("/reviews/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     public void removeReview(@PathVariable Long reviewId) {
         log.debug("Received DELETE-request at \"/reviews/{}\" endpoint", reviewId);
         reviewService.deleteReview(reviewId);
     }
 
-    @GetMapping("/reviews/{reviewId}")
+    @GetMapping("/{reviewId}")
     @ResponseBody
     public Review getReview(@PathVariable Long reviewId) {
         log.debug("Received GET-request at \"/reviews/{}\" endpoint", reviewId);
         return reviewService.getReview(reviewId);
     }
 
+    @GetMapping()
+    @ResponseBody
+    public List<Review> findReviews(
+            @RequestParam(defaultValue = "10", required = false) Integer count,
+            @RequestParam(required = false) Long filmId
+    ) {
+        log.debug("Received GET-request at \"/reviews\" endpoint with params: count=" + count + ", filmId=" + filmId);
+        if (filmId == null) {
+            return reviewService.getAllReviews(count);
+        } else {
+            return reviewService.getReviewsByFilmId(count, filmId);
+        }
+    }
+
 
 }
 /*
-
-        - `GET /reviews?filmId={filmId}&count={count}`
-        Получение всех отзывов по идентификатору фильма, если фильм не указан то все. Если кол-во не указано то 10.
 
         - `PUT /reviews/{id}/like/{userId}`  — пользователь ставит лайк отзыву.
         - `PUT /reviews/{id}/dislike/{userId}`  — пользователь ставит дизлайк отзыву.
