@@ -7,11 +7,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Repository
@@ -37,7 +42,7 @@ public class DbUserStorage implements UserStorage {
 
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         user.setId(id);
-
+        addEntity(user);
         return user;
     }
 
@@ -66,11 +71,11 @@ public class DbUserStorage implements UserStorage {
                 "NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ? " +
                 "WHERE id = ?";
         jdbcTemplate.update(sql,
-                    user.getName(),
-                    user.getLogin(),
-                    user.getEmail(),
-                    user.getBirthday(),
-                    user.getId());
+                user.getName(),
+                user.getLogin(),
+                user.getEmail(),
+                user.getBirthday(),
+                user.getId());
 
         return user;
     }
@@ -88,6 +93,7 @@ public class DbUserStorage implements UserStorage {
                 "VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sql, user.getId(), friendId, Boolean.FALSE);
+        addEvent(user.getId(), "FRIEND", "ADD", friendId);
 
         return user;
     }
@@ -105,6 +111,7 @@ public class DbUserStorage implements UserStorage {
         log.debug("Removing a friend with id={} the from friendlist of a user with id={}", friendId, user.getId());
         String sql = "DELETE FROM FRIENDSHIP_REQUESTS WHERE USER_ID=? AND FRIEND_ID=?";
         jdbcTemplate.update(sql, user.getId(), friendId);
+        addEvent(user.getId(), "FRIEND", "REMOVE", friendId);
         return user;
     }
 
@@ -126,5 +133,60 @@ public class DbUserStorage implements UserStorage {
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    @Override
+    public Collection<Event> getEventFeed(User user) {
+        String sqlEvent = "SELECT * FROM EVENT_FEED WHERE USER_ID = " + user.getId();
+        return jdbcTemplate.query(sqlEvent, (resultSet, rowNum) -> getEventDb(resultSet));
+
+    }
+
+    private Event getEventDb(ResultSet resultSet) throws SQLException {
+        long eventId = resultSet.getInt("EVENT_ID");
+        return new Event(
+                resultSet.getTimestamp("TIME").toLocalDateTime(),
+                resultSet.getLong("USER_ID"),
+                resultSet.getString("EVENT_TYPE"),
+                resultSet.getString("OPERATION"),
+                eventId,
+                resultSet.getLong("ENTITY_ID"));
+    }
+
+    @Override
+    public void addEvent(Long userId, String type, String operation, Long entityId) {
+        log.debug("Inserting new event into the database");
+
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("EVENT_FEED")
+                .usingGeneratedKeyColumns("EVENT_ID");
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("TIME", LocalDateTime.now())
+                .addValue("USER_ID", userId)
+                .addValue("EVENT_TYPE", type)
+                .addValue("OPERATION", operation)
+                .addValue("ENTITY_ID", entityId);
+        Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
+    }
+
+    @Override
+    public void addEntity(Object typeEntity) {
+        log.debug("Inserting new entity into the database");
+        if (typeEntity instanceof Film) {
+            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                    .withTableName("ENTITY")
+                    .usingGeneratedKeyColumns("ID");
+            MapSqlParameterSource params = new MapSqlParameterSource()
+                    .addValue("FILM_ID", ((Film) typeEntity).getId());
+            Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
+        } else if (typeEntity instanceof User) {
+            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                    .withTableName("ENTITY")
+                    .usingGeneratedKeyColumns("ID");
+            MapSqlParameterSource params = new MapSqlParameterSource()
+                    .addValue("USER_ID", ((User) typeEntity).getId());
+            Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
+        }
     }
 }

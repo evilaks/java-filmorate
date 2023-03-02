@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -68,8 +70,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
-    public List<Event> getEventFeed(@PathVariable("id") Long userId) {
+    public Collection<Event> getEventFeed(@PathVariable("id") Long userId) {
         log.debug("Received GET-request at /users/{}/feed endpoint", userId);
         return userService.getEventFeed(userService.getUser(userId));
-
+    }
 }

@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,4 +71,19 @@ public class InMemoryUserStorage implements UserStorage {
         log.debug("Method \"deleteAll\" not implemented in InMemoryUserStorage");
     }
 
+    @Override
+    public Collection<Event> getEventFeed(User user) {
+        log.debug("Method \"getEventFeed\" not implemented in InMemoryUserStorage");
+        return null;
+    }
+
+    @Override
+    public void addEvent(Long userId, String type, String operation, Long entityId) {
+        log.debug("Method \"addEvent\" not implemented in InMemoryUserStorage");
+    }
+
+    @Override
+    public void addEntity(Object typeEntity) {
+        log.debug("Method \"addEntity\" not implemented in InMemoryUserStorage");
+    }
 }
