@@ -75,11 +75,3 @@ public class ReviewController {
     }
 
 }
-/*
-
-        - `PUT /reviews/{id}/like/{userId}`  — пользователь ставит лайк отзыву.
-        - `PUT /reviews/{id}/dislike/{userId}`  — пользователь ставит дизлайк отзыву.
-        - `DELETE /reviews/{id}/like/{userId}`  — пользователь удаляет лайк/дизлайк отзыву.
-        - `DELETE /reviews/{id}/dislike/{userId}`  — пользователь удаляет дизлайк отзыву.
-
- */

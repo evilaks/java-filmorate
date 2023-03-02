@@ -25,8 +25,10 @@ public class ReviewService {
 
     public Review updateReview(Review review) {
         validateReview(review);
-        this.getReview(review.getReviewId());     // check review existence
-        return reviewStorage.update(review);
+        Review reviewToUpdate = this.getReview(review.getReviewId());     // also check review existence
+        reviewToUpdate.setContent(review.getContent());
+        reviewToUpdate.setIsPositive(review.getIsPositive());
+        return reviewStorage.update(reviewToUpdate);
     }
 
     public void deleteReview(Long reviewId) {
@@ -55,13 +57,14 @@ public class ReviewService {
     public void addMarkToReview(Long reviewId, Long userId, Boolean isUseful) {
         userService.getUser(userId); // throws 404 if user not found
         Review review = this.getReview(reviewId); // throws 404 if review not found
+        // todo check if mark already exists
         reviewStorage.addMark(review, userId, isUseful);
     }
 
     public void deleteMarkFromReview(Long reviewId, Long userId, Boolean isUseful) {
         userService.getUser(userId); // throws 404 if user not found
         Review review = this.getReview(reviewId); // throws 404 if review not found
-        if (isUseful) {
+        if (isUseful) {  // strange logic from the task :)
             reviewStorage.removeMark(review, userId, true);
             reviewStorage.removeMark(review, userId, false);
         } else {

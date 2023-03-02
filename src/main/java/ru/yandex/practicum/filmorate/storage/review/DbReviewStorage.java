@@ -61,22 +61,50 @@ public class DbReviewStorage implements ReviewStorage {
     @Override
     public Review get(Long id) {
         log.debug("Extracting a review from the database with id={}", id);
-        String sql = "SELECT * FROM REVIEWS WHERE ID=?";
-        Review review = jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), id)
+        String sql = "SELECT R.ID," +
+                "R.CONTENT ," +
+                "R.IS_POSITIVE ," +
+                "R.USER_ID ," +
+                "R.FILM_ID ," +
+                "COALESCE(POSITIVE, 0) - COALESCE(NEGATIVE, 0) AS USEFUL FROM REVIEWS R " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS PID, count(user_id) AS POSITIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = TRUE " +
+                "GROUP BY PID) AS POS ON POS.PID = R.ID " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS NID, count(user_id) AS NEGATIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = FALSE " +
+                "GROUP BY NID" +
+                ") AS NEG ON NEG.NID = R.ID " +
+                "WHERE R.ID = ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), id)
                 .stream()
                 .findFirst()
                 .orElse(null);
-
-        // todo count useful
-
-        return review;
     }
 
     @Override
     public List<Review> getAll(Integer count) {
         log.debug("Extracting all reviews from the database");
-        String sql = "SELECT ID FROM REVIEWS ORDER BY ID DESC LIMIT ?"; // todo change order by useful
-        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("id")), count);
+        String sql = "SELECT R.ID," +
+                "R.CONTENT ," +
+                "R.IS_POSITIVE ," +
+                "R.USER_ID ," +
+                "R.FILM_ID ," +
+                "COALESCE(POSITIVE, 0) - COALESCE(NEGATIVE, 0) AS USEFUL FROM REVIEWS R " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS PID, count(user_id) AS POSITIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = TRUE " +
+                "GROUP BY PID) AS POS ON POS.PID = R.ID " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS NID, count(user_id) AS NEGATIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = FALSE " +
+                "GROUP BY NID" +
+                ") AS NEG ON NEG.NID = R.ID " +
+                "ORDER BY USEFUL DESC, R.ID " +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), count);
     }
 
     @Override
@@ -103,10 +131,12 @@ public class DbReviewStorage implements ReviewStorage {
     @Override
     public void delete(Long id) {
         log.debug("Deleting a review from the database with id={}", id);
-        String deleteQuery = "DELETE FROM REVIEWS WHERE ID=?";
-        jdbcTemplate.update(deleteQuery, id);
 
-        // todo delete review marks
+        String deleteReviewMarksQuery = "DELETE FROM REVIEW_MARKS WHERE REVIEW_ID=?";
+        jdbcTemplate.update(deleteReviewMarksQuery, id);
+
+        String deleteReviewQuery = "DELETE FROM REVIEWS WHERE ID=?";
+        jdbcTemplate.update(deleteReviewQuery, id);
     }
 
     private Review createReview(ResultSet rs) throws SQLException {
@@ -116,6 +146,7 @@ public class DbReviewStorage implements ReviewStorage {
                 .isPositive(rs.getBoolean("is_positive"))
                 .userId(rs.getLong("user_id"))
                 .filmId(rs.getLong("film_id"))
+                .useful(rs.getLong("useful"))
                 .build();
     }
 
