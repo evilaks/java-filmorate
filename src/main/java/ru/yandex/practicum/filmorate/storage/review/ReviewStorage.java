@@ -15,6 +15,10 @@ public interface ReviewStorage {
 
     List<Review> findReviewsByFilmId(Integer count, Long filmId);
 
+    void addMark(Review review, Long userId, Boolean isUseful);
+
+    void removeMark(Review review, Long userId, Boolean isUseful);
+
     void delete(Long id);
 
 

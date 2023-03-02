@@ -87,6 +87,20 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
+    public void addMark(Review review, Long userId, Boolean isUseful) {
+        log.debug("Adding mark to review with id=" + review.getReviewId() + " from user with id= " + userId);
+        String sql = "INSERT INTO REVIEW_MARKS (REVIEW_ID, USER_ID, IS_USEFUL) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, review.getReviewId(), userId, isUseful);
+    }
+
+    @Override
+    public void removeMark(Review review, Long userId, Boolean isUseful) {
+        log.debug("Deleting mark of review with id=" + review.getReviewId() + " from user with id= " + userId);
+        String sql = "DELETE FROM REVIEW_MARKS WHERE REVIEW_ID=? AND USER_ID=? AND IS_USEFUL=?";
+        jdbcTemplate.update(sql, review.getReviewId(), userId, isUseful);
+    }
+
+    @Override
     public void delete(Long id) {
         log.debug("Deleting a review from the database with id={}", id);
         String deleteQuery = "DELETE FROM REVIEWS WHERE ID=?";
@@ -104,4 +118,6 @@ public class DbReviewStorage implements ReviewStorage {
                 .filmId(rs.getLong("film_id"))
                 .build();
     }
+
+
 }

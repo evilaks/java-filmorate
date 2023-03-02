@@ -52,6 +52,23 @@ public class ReviewService {
         return reviewStorage.findReviewsByFilmId(count, filmId);
     }
 
+    public void addMarkToReview(Long reviewId, Long userId, Boolean isUseful) {
+        userService.getUser(userId); // throws 404 if user not found
+        Review review = this.getReview(reviewId); // throws 404 if review not found
+        reviewStorage.addMark(review, userId, isUseful);
+    }
+
+    public void deleteMarkFromReview(Long reviewId, Long userId, Boolean isUseful) {
+        userService.getUser(userId); // throws 404 if user not found
+        Review review = this.getReview(reviewId); // throws 404 if review not found
+        if (isUseful) {
+            reviewStorage.removeMark(review, userId, true);
+            reviewStorage.removeMark(review, userId, false);
+        } else {
+            reviewStorage.removeMark(review, userId, false);
+        }
+    }
+
     private void validateReview(Review review)  {
         filmService.getFilm(review.getFilmId());  // check film existence
         userService.getUser(review.getUserId());  // check user existence

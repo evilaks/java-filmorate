@@ -56,6 +56,23 @@ public class ReviewController {
         }
     }
 
+    @PutMapping("/{reviewId}/like/{userId}")
+    public void addPositiveMarkToReview(@PathVariable Long reviewId, @PathVariable Long userId) {
+        log.debug("Received PUT-request at \"/reviews/{}/like/{}\" endpoint", reviewId, userId);
+        reviewService.addMarkToReview(reviewId, userId, true);
+    }
+
+    @PutMapping("/{reviewId}/dislike/{userId}")
+    public void addNegativeMarkToReview(@PathVariable Long reviewId, @PathVariable Long userId) {
+        log.debug("Received PUT-request at \"/reviews/{}/dislike/{}\" endpoint", reviewId, userId);
+        reviewService.addMarkToReview(reviewId, userId, false);
+    }
+
+    @DeleteMapping("/{reviewId}/like/{userId}")
+    public void deleteMarkToReview(@PathVariable Long reviewId, @PathVariable Long userId) {
+        log.debug("Received DELETE-request at \"/reviews/{}/dislike/{}\" endpoint", reviewId, userId);
+        reviewService.deleteMarkFromReview(reviewId, userId, false);
+    }
 
 }
 /*
