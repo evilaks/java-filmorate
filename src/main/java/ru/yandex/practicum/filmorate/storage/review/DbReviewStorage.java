@@ -78,10 +78,12 @@ public class DbReviewStorage implements ReviewStorage {
                 ") AS NEG ON NEG.NID = R.ID " +
                 "WHERE R.ID = ?";
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), id)
+        Review review = jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), id)
                 .stream()
                 .findFirst()
                 .orElse(null);
+
+        return review;
     }
 
     @Override
@@ -110,8 +112,25 @@ public class DbReviewStorage implements ReviewStorage {
     @Override
     public List<Review> findReviewsByFilmId(Integer count, Long filmId) {
         log.debug("Extracting all reviews from the database for the film with id={}", filmId);
-        String sql = "SELECT ID FROM REVIEWS WHERE FILM_ID=? ORDER BY ID DESC LIMIT ?"; // todo change order by useful
-        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("id")), filmId, count);
+        String sql = "SELECT R.ID," +
+                "R.CONTENT ," +
+                "R.IS_POSITIVE ," +
+                "R.USER_ID ," +
+                "R.FILM_ID ," +
+                "COALESCE(POSITIVE, 0) - COALESCE(NEGATIVE, 0) AS USEFUL FROM REVIEWS R " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS PID, count(user_id) AS POSITIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = TRUE " +
+                "GROUP BY PID) AS POS ON POS.PID = R.ID " +
+                "LEFT JOIN (" +
+                "SELECT REVIEW_ID AS NID, count(user_id) AS NEGATIVE " +
+                "FROM REVIEW_MARKS rm WHERE IS_USEFUL = FALSE " +
+                "GROUP BY NID" +
+                ") AS NEG ON NEG.NID = R.ID " +
+                "WHERE R.FILM_ID =? " +
+                "ORDER BY USEFUL DESC, R.ID " +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> createReview(rs), filmId, count);
     }
 
     @Override
