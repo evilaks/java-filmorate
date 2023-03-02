@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
@@ -57,8 +59,12 @@ public class ReviewService {
     public void addMarkToReview(Long reviewId, Long userId, Boolean isUseful) {
         userService.getUser(userId); // throws 404 if user not found
         Review review = this.getReview(reviewId); // throws 404 if review not found
-        // todo check if mark already exists
-        reviewStorage.addMark(review, userId, isUseful);
+        try {
+            reviewStorage.addMark(review, userId, isUseful);
+        } catch (DuplicateKeyException e) {
+            log.warn("Failed to add existing mark with userId={} and reviewId={}", userId, reviewId);
+            throw new BadRequestException("Mark with such reviewId and userId is already exist");
+        }
     }
 
     public void deleteMarkFromReview(Long reviewId, Long userId, Boolean isUseful) {
