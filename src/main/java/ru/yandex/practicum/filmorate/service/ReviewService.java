@@ -13,32 +13,37 @@ import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final FilmService filmService;
+    private final UserService userService;
 
     public Review addReview(Review review) {
-        // todo check film existence
-        // todo check user existence
+        validateReview(review);
         return reviewStorage.add(review);
     }
 
     public Review updateReview(Review review) {
-        // todo check film existence
-        // todo check user existence
-        // todo check review existence
+        validateReview(review);
+        this.getReview(review.getReviewId());     // check review existence
         return reviewStorage.update(review);
     }
 
     public void deleteReview(Long reviewId) {
-        // todo check if exists
+        this.getReview(reviewId);                 // throws 404 if review doesn't exist
         reviewStorage.delete(reviewId);
     }
 
-    public Review getReview(Long reviewId) {
+    public Review getReview(Long reviewId) throws NotFoundException {
         Review review = reviewStorage.get(reviewId);
         if (review == null) {
-            throw new NotFoundException("Review with id= " + reviewId + " not found.");
+            throw new NotFoundException("Review with id=" + reviewId + " not found.");
         } else {
             return review;
         }
+    }
+
+    private void validateReview(Review review)  {
+        filmService.getFilm(review.getFilmId());  // check film existence
+        userService.getUser(review.getUserId());  // check user existence
     }
 
 }

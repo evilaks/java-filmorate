@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @RequestMapping
@@ -15,13 +17,13 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/reviews")
-    public Review addReview(@RequestBody Review review) {
+    public Review addReview(@RequestBody @Valid Review review) {
         log.debug("Received POST-request at \"/reviews\" endpoint with body: {}", review);
         return reviewService.addReview(review);
     }
 
     @PutMapping("/reviews")
-    public Review updateReview(@RequestBody Review review) {
+    public Review updateReview(@RequestBody @Valid Review review) {
         log.debug("Received PUT-request at \"/reviews\" endpoint with body: {}", review);
         return reviewService.updateReview(review);
     }

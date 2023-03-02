@@ -30,7 +30,7 @@ public class DbReviewStorage implements ReviewStorage {
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("content", review.getContent())
-                .addValue("is_positive", review.isPositive())
+                .addValue("is_positive", review.getIsPositive())
                 .addValue("user_id", review.getUserId())
                 .addValue("film_id", review.getFilmId());
 
@@ -49,7 +49,7 @@ public class DbReviewStorage implements ReviewStorage {
                 "WHERE id=?";
         jdbcTemplate.update(sql,
                 review.getContent(),
-                review.isPositive(),
+                review.getIsPositive(),
                 review.getUserId(),
                 review.getFilmId(),
                 review.getReviewId());
