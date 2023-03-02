@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -16,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -161,6 +164,12 @@ public class DbFilmStorage implements FilmStorage {
                 "WHERE FILM_ID=?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
     }
+
+    @Override
+    public List<Long> getLikesFilmsInUserId(Long userId) { // id фильмов которым поставил лайк этот user
+        log.debug("Extracting from the database of films that the user has liked with id={}", userId);
+        return  jdbcTemplate.queryForList("SELECT FILM_ID FROM LIKES WHERE USER_ID=?", Long.class, userId);
+        }
 
     private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()

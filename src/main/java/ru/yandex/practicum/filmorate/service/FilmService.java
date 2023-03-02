@@ -3,17 +3,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -119,6 +119,25 @@ public class FilmService {
             }
         }
         return false;
+    }
+
+    public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId){ //вывод общих с другом фильмов с сортировкой по их популярности.
+        List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getLikesFilmsInUserId(userId));
+        List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getLikesFilmsInUserId(friendId));
+        List<Film> mutualFilmList = new ArrayList<>();
+        for (int i = 0; i < filmLikesUserId.size(); i++) {
+            if (filmLikesFriendsId.contains(filmLikesUserId.get(i))) {
+                mutualFilmList.add(filmStorage.get(filmLikesUserId.get(i)));
+            }
+        }
+        Collections.sort(mutualFilmList, new Comparator<Film>() {
+            @Override
+            public int compare(Film o1, Film o2) {
+                return o1.getLikes().size() - o2.getLikes().size();
+            }
+        });
+        return mutualFilmList;
+
     }
 
 }
