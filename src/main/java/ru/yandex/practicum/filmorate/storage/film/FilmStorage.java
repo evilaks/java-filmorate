@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.List;
+import java.util.*;
 
 public interface FilmStorage {
 
@@ -28,6 +28,6 @@ public interface FilmStorage {
 
     List<Long> getFilmLikes(Film film);
 
-    List<Long> getLikesFilmsInUserId (Long userId);
+    List<Long> getIdFilmsWithUserLikes (Long userId);
 
 }
