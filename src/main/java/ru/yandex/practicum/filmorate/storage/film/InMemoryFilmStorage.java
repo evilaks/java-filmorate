@@ -78,4 +78,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.debug("Unimplemented \"getFilmLikes\" method called");
         return null;
     }
+
+    @Override
+    public List<Long> getIdFilmsWithUserLikes(Long userId) {
+        log.debug("Unimplemented \"getIdFilmsWithUserLikes\" method called");
+        return null;
+    }
 }

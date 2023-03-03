@@ -162,6 +162,12 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
     }
 
+    @Override
+    public List<Long> getIdFilmsWithUserLikes(Long userId) { // id фильмов которым поставил лайк этот user
+        log.debug("Extracting from the database of films that the user has liked with id={}", userId);
+        return  jdbcTemplate.queryForList("SELECT FILM_ID FROM LIKES WHERE USER_ID=?", Long.class, userId);
+        }
+
     private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("id"))

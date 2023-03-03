@@ -11,9 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -119,6 +117,25 @@ public class FilmService {
             }
         }
         return false;
+    }
+
+    public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId){ //вывод общих с другом фильмов с сортировкой по их популярности.
+        List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
+        List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
+        List<Film> mutualFilmList = new ArrayList<>();
+        for(long t: filmLikesUserId){
+            if (filmLikesFriendsId.contains(t)) {
+                mutualFilmList.add(filmStorage.get(t));
+            }
+        }
+        Collections.sort(mutualFilmList, new Comparator<Film>() {
+            @Override
+            public int compare(Film o1, Film o2) {
+                return o1.getLikes().size() - o2.getLikes().size();
+            }
+        });
+        return mutualFilmList;
+
     }
 
 }
