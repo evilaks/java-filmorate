@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -23,6 +24,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
+    private final DirectorService directorService;
 
     public List<Film> getAllFilms() {
         return filmStorage.getAll()
@@ -53,7 +55,6 @@ public class FilmService {
         } else {
             return filmStorage.update(this.normalizeGenresInFilm(film));
         }
-
     }
 
     public Film addLike(Long filmId, Long userId) {
@@ -85,6 +86,15 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        Director director = directorService.getDirector(directorId);
+        if (sortBy.isBlank() || (!sortBy.equals("year") && !sortBy.equals("likes"))) {
+            log.debug("Receiving films by director");
+            throw new BadRequestException("Bad request parameter 'sortBy'");
+        }
+        return filmStorage.getSortedFilmsFromDirector(director.getId(), sortBy);
     }
 
     private Film normalizeGenresInFilm(Film film) {
@@ -120,5 +130,4 @@ public class FilmService {
         }
         return false;
     }
-
 }

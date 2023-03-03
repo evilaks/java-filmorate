@@ -8,7 +8,7 @@ public interface DirectorStorage {
 
     List<Director> getAll();
 
-    Director getDirector();
+    Director getDirector(Long directorId);
 
     Director addDirector(Director director);
 
