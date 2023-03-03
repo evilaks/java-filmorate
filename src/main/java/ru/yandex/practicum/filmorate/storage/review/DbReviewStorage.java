@@ -39,7 +39,7 @@ public class DbReviewStorage implements ReviewStorage {
 
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         review.setReviewId(id);
-        userStorage.addEvent(review.getUserId(), "REVIEW", "ADD", review.getReviewId());
+
         return review;
     }
 
@@ -56,7 +56,6 @@ public class DbReviewStorage implements ReviewStorage {
                 review.getUserId(),
                 review.getFilmId(),
                 review.getReviewId());
-        userStorage.addEvent(review.getUserId(), "REVIEW", "UPDATE", review.getReviewId());
 
         return review;
     }
@@ -153,7 +152,6 @@ public class DbReviewStorage implements ReviewStorage {
     @Override
     public void delete(Long id) {
         log.debug("Deleting a review from the database with id={}", id);
-        userStorage.addEvent(get(id).getUserId(), "REVIEW", "REMOVE", id);
 
         String deleteReviewMarksQuery = "DELETE FROM REVIEW_MARKS WHERE REVIEW_ID=?";
         jdbcTemplate.update(deleteReviewMarksQuery, id);

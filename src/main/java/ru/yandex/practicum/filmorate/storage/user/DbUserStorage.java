@@ -90,7 +90,6 @@ public class DbUserStorage implements UserStorage {
                 "VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sql, user.getId(), friendId, Boolean.FALSE);
-        addEvent(user.getId(), "FRIEND", "ADD", friendId);
 
         return user;
     }
@@ -108,7 +107,6 @@ public class DbUserStorage implements UserStorage {
         log.debug("Removing a friend with id={} the from friendlist of a user with id={}", friendId, user.getId());
         String sql = "DELETE FROM FRIENDSHIP_REQUESTS WHERE USER_ID=? AND FRIEND_ID=?";
         jdbcTemplate.update(sql, user.getId(), friendId);
-        addEvent(user.getId(), "FRIEND", "REMOVE", friendId);
         return user;
     }
 
@@ -136,8 +134,8 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public Collection<Event> getEventFeed(User user) {
-        String sqlEvent = "SELECT * FROM EVENT_FEED WHERE USER_ID = " + user.getId();
-        return jdbcTemplate.query(sqlEvent, (resultSet, rowNum) -> getEventDb(resultSet));
+        String sqlEvent = "SELECT * FROM EVENT_FEED WHERE USER_ID = ?";
+        return jdbcTemplate.query(sqlEvent, (resultSet, rowNum) -> getEventDb(resultSet), user.getId());
 
     }
 
@@ -165,6 +163,6 @@ public class DbUserStorage implements UserStorage {
                 .addValue("EVENT_TYPE", type)
                 .addValue("OPERATION", operation)
                 .addValue("ENTITY_ID", entityId);
-                simpleJdbcInsert.execute(params);
+        simpleJdbcInsert.execute(params);
     }
 }

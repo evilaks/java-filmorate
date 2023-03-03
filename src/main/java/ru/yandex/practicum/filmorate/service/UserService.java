@@ -54,6 +54,7 @@ public class UserService {
         } else if (userStorage.get(friendId) == null) {
             throw new NotFoundException("Friend not found");
         } else {
+            userStorage.addEvent(user.getId(), "FRIEND", "ADD", friendId);
             return userStorage.addFriend(user, friendId);
         }
     }
@@ -64,6 +65,7 @@ public class UserService {
         } else if (userStorage.get(friendId) == null) {
             throw new NotFoundException("Friend not found");
         } else {
+            userStorage.addEvent(user.getId(), "FRIEND", "REMOVE", friendId);
             return userStorage.removeFriend(user, friendId);
         }
     }
