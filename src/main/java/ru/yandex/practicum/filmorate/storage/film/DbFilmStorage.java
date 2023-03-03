@@ -53,7 +53,6 @@ public class DbFilmStorage implements FilmStorage {
                 jdbcTemplate.update(sql, film.getId(), genre.getId());
             }
         }
-        userStorage.addEntity(film);
         return this.get(film.getId());
     }
 

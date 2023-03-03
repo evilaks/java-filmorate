@@ -81,9 +81,4 @@ public class InMemoryUserStorage implements UserStorage {
     public void addEvent(Long userId, String type, String operation, Long entityId) {
         log.debug("Method \"addEvent\" not implemented in InMemoryUserStorage");
     }
-
-    @Override
-    public void addEntity(Object typeEntity) {
-        log.debug("Method \"addEntity\" not implemented in InMemoryUserStorage");
-    }
 }

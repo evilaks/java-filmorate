@@ -6,18 +6,15 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.sql.*;
 
 @Slf4j
 @Repository
@@ -43,7 +40,6 @@ public class DbUserStorage implements UserStorage {
 
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         user.setId(id);
-        addEntity(user);
         return user;
     }
 
@@ -119,6 +115,8 @@ public class DbUserStorage implements UserStorage {
     @Override
     public void deleteAll() {
         log.debug("Deleting all data from users");
+        jdbcTemplate.update("DELETE FROM EVENT_FEED");
+        jdbcTemplate.update("ALTER TABLE EVENT_FEED ALTER COLUMN EVENT_ID RESTART WITH 1");
         jdbcTemplate.update("DELETE FROM LIKES");
         jdbcTemplate.update("DELETE FROM FRIENDSHIP_REQUESTS");
         jdbcTemplate.update("delete from users");
@@ -154,54 +152,19 @@ public class DbUserStorage implements UserStorage {
                 resultSet.getLong("ENTITY_ID"));
     }
 
-    private Entity getEntityDb(ResultSet resultSet) throws SQLException {
-        return new Entity(
-                resultSet.getInt("ID"),
-                resultSet.getInt("FILM_ID"),
-                resultSet.getInt("USER_ID"));
-    }
-
     @Override
     public void addEvent(Long userId, String type, String operation, Long entityId) {
         log.debug("Inserting new event into the database");
-        Entity entity;
-        /*if (type.equals("FRIEND")) {
-            String sqlEntity = "SELECT * FROM ENTITY WHERE USER_ID = " + entityId;
-            entity = jdbcTemplate.queryForObject(sqlEntity, (resultSet, rowNum) -> getEntityDb(resultSet));
-        } else {
-            String sqlEntity = "SELECT * FROM ENTITY WHERE FILM_ID = " + entityId;
-            entity = jdbcTemplate.queryForObject(sqlEntity, (resultSet, rowNum) -> getEntityDb(resultSet));
-        }*/
-    SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-            .withTableName("EVENT_FEED")
-            .usingGeneratedKeyColumns("EVENT_ID");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("EVENT_FEED")
+                .usingGeneratedKeyColumns("EVENT_ID");
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("TIME", Instant.now())
-            .addValue("USER_ID", userId)
-            .addValue("EVENT_TYPE", type)
-            .addValue("OPERATION", operation)
-            .addValue("ENTITY_ID", entityId);
-    Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
-}
-
-    @Override
-    public void addEntity(Object typeEntity) {
-        log.debug("Inserting new entity into the database");
-        if (typeEntity instanceof Film) {
-            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                    .withTableName("ENTITY")
-                    .usingGeneratedKeyColumns("ID");
-            MapSqlParameterSource params = new MapSqlParameterSource()
-                    .addValue("FILM_ID", ((Film) typeEntity).getId());
-            Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
-        } else if (typeEntity instanceof User) {
-            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                    .withTableName("ENTITY")
-                    .usingGeneratedKeyColumns("ID");
-            MapSqlParameterSource params = new MapSqlParameterSource()
-                    .addValue("USER_ID", ((User) typeEntity).getId());
-            Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
-        }
+                .addValue("TIME", Instant.now())
+                .addValue("USER_ID", userId)
+                .addValue("EVENT_TYPE", type)
+                .addValue("OPERATION", operation)
+                .addValue("ENTITY_ID", entityId);
+                simpleJdbcInsert.execute(params);
     }
 }
