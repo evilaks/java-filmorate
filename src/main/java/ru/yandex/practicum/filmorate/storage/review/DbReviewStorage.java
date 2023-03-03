@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ import java.util.List;
 public class DbReviewStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final UserStorage userStorage;
 
     @Override
     public Review add(Review review) {
@@ -37,7 +39,7 @@ public class DbReviewStorage implements ReviewStorage {
 
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         review.setReviewId(id);
-
+        userStorage.addEvent(review.getUserId(), "REVIEW", "ADD", review.getUserId());
         return review;
     }
 
@@ -54,6 +56,7 @@ public class DbReviewStorage implements ReviewStorage {
                 review.getUserId(),
                 review.getFilmId(),
                 review.getReviewId());
+        userStorage.addEvent(review.getUserId(), "REVIEW", "UPDATE", review.getUserId());
 
         return review;
     }
@@ -150,6 +153,7 @@ public class DbReviewStorage implements ReviewStorage {
     @Override
     public void delete(Long id) {
         log.debug("Deleting a review from the database with id={}", id);
+        userStorage.addEvent(get(id).getUserId(), "REVIEW", "REMOVE", get(id).getFilmId());
 
         String deleteReviewMarksQuery = "DELETE FROM REVIEW_MARKS WHERE REVIEW_ID=?";
         jdbcTemplate.update(deleteReviewMarksQuery, id);
