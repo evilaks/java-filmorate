@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.DbGenreStorage;
+import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -39,7 +41,7 @@ public class FilmControllerTest {
                 testUserService,
                 new GenreService(
                         new DbGenreStorage(
-                                new JdbcTemplate())));
+                                new JdbcTemplate())), new DbUserStorage(new JdbcTemplate()));
         testFilmController = new FilmController(testFilmService);
     }
 

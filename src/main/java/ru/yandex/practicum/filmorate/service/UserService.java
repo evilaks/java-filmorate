@@ -5,13 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,6 +54,7 @@ public class UserService {
         } else if (userStorage.get(friendId) == null) {
             throw new NotFoundException("Friend not found");
         } else {
+            userStorage.addEvent(user.getId(), "FRIEND", "ADD", friendId);
             return userStorage.addFriend(user, friendId);
         }
     }
@@ -65,6 +65,7 @@ public class UserService {
         } else if (userStorage.get(friendId) == null) {
             throw new NotFoundException("Friend not found");
         } else {
+            userStorage.addEvent(user.getId(), "FRIEND", "REMOVE", friendId);
             return userStorage.removeFriend(user, friendId);
         }
     }
@@ -110,5 +111,10 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public Collection<Event> getEventFeed(User user) {
+        return Optional.ofNullable(userStorage.getEventFeed(user))
+                .orElseThrow(() -> new NotFoundException("Events for userId " + user.getId() + " not found!"));
     }
 }

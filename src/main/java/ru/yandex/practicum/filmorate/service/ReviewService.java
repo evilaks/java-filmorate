@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
@@ -19,10 +20,13 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmService filmService;
     private final UserService userService;
+    private final UserStorage userStorage;
 
     public Review addReview(Review review) {
         validateReview(review);
-        return reviewStorage.add(review);
+        Review result = reviewStorage.add(review);
+        userStorage.addEvent(result.getUserId(), "REVIEW", "ADD", result.getReviewId());
+        return result;
     }
 
     public Review updateReview(Review review) {
@@ -30,11 +34,14 @@ public class ReviewService {
         Review reviewToUpdate = this.getReview(review.getReviewId());     // also check review existence
         reviewToUpdate.setContent(review.getContent());
         reviewToUpdate.setIsPositive(review.getIsPositive());
-        return reviewStorage.update(reviewToUpdate);
+        Review result = reviewStorage.update(reviewToUpdate);
+        userStorage.addEvent(result.getUserId(), "REVIEW", "UPDATE", result.getReviewId());
+        return result;
     }
 
     public void deleteReview(Long reviewId) {
         this.getReview(reviewId);                 // throws 404 if review doesn't exist
+        userStorage.addEvent(reviewStorage.get(reviewId).getUserId(), "REVIEW", "REMOVE", reviewId);
         reviewStorage.delete(reviewId);
     }
 

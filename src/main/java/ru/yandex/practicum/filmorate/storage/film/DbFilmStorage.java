@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
+    private final UserStorage userStorage;
 
     @Override
     public Film add(Film film) {
@@ -51,7 +53,6 @@ public class DbFilmStorage implements FilmStorage {
                 jdbcTemplate.update(sql, film.getId(), genre.getId());
             }
         }
-
         return this.get(film.getId());
     }
 
