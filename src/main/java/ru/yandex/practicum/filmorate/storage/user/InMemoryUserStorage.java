@@ -44,7 +44,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void remove(User user) {
+    public void deleteUser(Long userId) {
         log.debug("Unimplemented \"remove\" method called");
     }
 

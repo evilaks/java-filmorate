@@ -78,8 +78,25 @@ public class DbUserStorage implements UserStorage {
     }
 
     @Override
-    public void remove(User user) {
-        log.debug("Deleting user with id={} from the database [NOT IMPLEMENTED]", user.getId());
+    public void deleteUser(Long userId) {
+        log.debug("Deleting a user with id={}", userId);
+        String sqlEvent = "DELETE FROM EVENT_FEED WHERE USER_ID=?";
+        jdbcTemplate.update(sqlEvent, userId);
+
+        String sqlMarks = "DELETE FROM REVIEW_MARKS WHERE USER_ID=?";
+        jdbcTemplate.update(sqlMarks, userId);
+
+        String sqlReviews = "DELETE FROM REVIEWS WHERE USER_ID=?";
+        jdbcTemplate.update(sqlReviews, userId);
+
+        String sqlLikes = "DELETE FROM LIKES WHERE USER_ID=?";
+        jdbcTemplate.update(sqlLikes, userId);
+
+        String sqlFrend = "DELETE FROM FRIENDSHIP_REQUESTS WHERE USER_ID=? OR FRIEND_ID =?";
+        jdbcTemplate.update(sqlFrend, userId, userId);
+
+        String sqlUser = "DELETE FROM USERS WHERE ID=?";
+        jdbcTemplate.update(sqlUser, userId);
     }
 
     @Override
