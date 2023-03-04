@@ -198,6 +198,6 @@ public class DbFilmStorage implements FilmStorage {
                 "                                         LIMIT 1) AS BESTUSER)) AS BESTUSERSFILMS " +
                 "                              ON USERSFILMS.FILM_ID = BESTUSERSFILMS.FILM_ID) AS RESULT " +
                 "    WHERE RESULT.USERSFILMS = -1)";
-        return jdbcTemplate.query(sql,(rs,rowNum)->createFilm(rs),userId,userId,userId);
+        return jdbcTemplate.query(sql,(rs,rowNum)->this.get(rs.getLong("ID")),userId,userId,userId);
     }
 }
