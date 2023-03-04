@@ -84,4 +84,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.debug("Unimplemented \"getIdFilmsWithUserLikes\" method called");
         return null;
     }
+
+    @Override
+    public List<Long> getPopularFilmGenreIdYear(int limit, int genreId, int year) {
+        log.debug("Unimplemented \"getPopularFilmGenreIdYear\" method called");
+        return null;
+    }
 }

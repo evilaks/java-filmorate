@@ -164,9 +164,27 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Long> getIdFilmsWithUserLikes(Long userId) { // id фильмов которым поставил лайк этот user
-        log.debug("Extracting from the database of films that the user has liked with id={}", userId);
+        log.debug("Extract from the database of movies shared with another user and sorted id={}", userId);
         return  jdbcTemplate.queryForList("SELECT FILM_ID FROM LIKES WHERE USER_ID=?", Long.class, userId);
         }
+
+    @Override
+    public List<Long> getPopularFilmGenreIdYear(int count, int genreId, int year) {
+        log.debug("Extract from the database of popular films by genre and year genreId = "+ genreId + "year = " + year);
+        String lim;
+        String sql = "SELECT ID \n" +
+        "FROM (\n" +
+        "\tSELECT ID, COUNT(USER_ID) AS LIKES_COUNT \n" +
+        "\tFROM FILMS AS fi \n" +
+        "\tINNER JOIN FILM_GENRE AS fg ON fi.id = fg.film_id \n" +
+        "\tINNER JOIN LIKES AS li ON fi.id = li.film_id \n" +
+        "\tWHERE  EXTRACT(YEAR FROM RELEASE_DATE) = 1999 AND GENRE_ID = 1 \n" +
+        "\tGROUP BY ID \n" +
+        "\tORDER BY LIKES_COUNT DESC) \n" +
+        "\tLIMIT ?;";
+
+        return jdbcTemplate.queryForList(sql, Long.class, count);
+    }
 
     private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()

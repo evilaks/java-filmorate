@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -135,7 +136,16 @@ public class FilmService {
             }
         });
         return mutualFilmList;
+    }
 
+    public List<Film> getPopularFilmGenreIdYear(int limit, int genreId, int year){
+        List<Long> filmIdSorted = new ArrayList<>(filmStorage.getPopularFilmGenreIdYear(limit, genreId, year));
+        List<Film> mutualFilmList = new ArrayList<>();
+        for(long t: filmIdSorted){
+            mutualFilmList.add(filmStorage.get(t));
+        }
+
+        return mutualFilmList;
     }
 
 }

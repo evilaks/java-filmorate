@@ -30,4 +30,6 @@ public interface FilmStorage {
 
     List<Long> getIdFilmsWithUserLikes (Long userId);
 
+    List<Long> getPopularFilmGenreIdYear (int limit, int genreId, int year);
+
 }
