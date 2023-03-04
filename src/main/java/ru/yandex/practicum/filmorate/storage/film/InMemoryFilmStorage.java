@@ -84,4 +84,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.debug("Unimplemented \"getSortedFilmsFromDirector\" method called");
         return null;
     }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        log.debug("Unimplemented \"searchFilms\" method called");
+        return null;
+    }
 }
