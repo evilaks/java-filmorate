@@ -74,4 +74,10 @@ public class UserController {
         log.debug("Received GET-request at /users/{}/feed endpoint", userId);
         return userService.getEventFeed(userService.getUser(userId));
     }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.debug("Received DELETE-request at /users/{} endpoint", userId);
+        userService.deleteUser(userId);
+    }
 }

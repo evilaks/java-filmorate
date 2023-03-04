@@ -48,6 +48,12 @@ public class UserService {
         return user;
     }
 
+    public void deleteUser(Long userId) {
+        Optional.ofNullable(userStorage.get(userId))
+                .orElseThrow(() -> new NotFoundException("User for userId " + userId + " not found!"));
+        userStorage.deleteUser(userId);
+    }
+
     public User addFriend(User user, long friendId) {
         if (userStorage.get(user.getId()) == null) {
             throw new NotFoundException("User not found");
