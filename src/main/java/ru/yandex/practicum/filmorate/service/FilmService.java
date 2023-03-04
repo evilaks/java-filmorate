@@ -121,4 +121,9 @@ public class FilmService {
         return false;
     }
 
+    public List<Film> getRecommendations(Long userId) {
+        //Проверим есть ли пользователь, для которого составляем рекомендацию
+        userService.getUser(userId);
+        return filmStorage.getRecommendations(userId);
+    }
 }

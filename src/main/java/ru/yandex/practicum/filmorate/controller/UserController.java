@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -18,6 +20,7 @@ public class UserController {
 
     private final UserStorage userStorage;
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping("/users")
     public List<User> getUsers() {
@@ -65,6 +68,11 @@ public class UserController {
     public List<User> getMutualFriends(@PathVariable("userId") Long userId, @PathVariable("otherId") Long otherId) {
         log.debug("Received GET-request at /users/{}/friends/common/{} endpoint", userId, otherId);
         return userService.getMutualFriends(userService.getUser(userId), userService.getUser(otherId));
+    }
+
+    @GetMapping("/users/{userId}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Long userId) {
+        return filmService.getRecommendations(userId);
     }
 
 }
