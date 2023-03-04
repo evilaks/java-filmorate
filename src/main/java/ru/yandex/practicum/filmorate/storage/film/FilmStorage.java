@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-    void remove(Film film);
+    void deleteFilm(Long filmId);
 
     void deleteAll();
 

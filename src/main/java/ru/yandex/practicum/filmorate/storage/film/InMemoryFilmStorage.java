@@ -42,8 +42,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void remove(Film film) {
-        log.debug("Unimplemented \"remove\" method called");
+    public void deleteFilm(Long filmId) {
+        log.debug("Unimplemented \"deleteFilm\" method called");
     }
 
     @Override
