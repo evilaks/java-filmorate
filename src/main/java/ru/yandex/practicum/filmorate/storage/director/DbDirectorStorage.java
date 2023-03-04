@@ -22,14 +22,14 @@ public class DbDirectorStorage implements DirectorStorage {
     @Override
     public List<Director> getAll() {
         log.debug("Extracting all directors from the database");
-        String sql = "SELECT * FROM DIRECTOR";
+        String sql = "SELECT * FROM DIRECTORS";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createDirector(rs));
     }
 
     @Override
     public Director getDirector(Long directorId) {
         log.debug("Extracting director with id={} from the database", directorId);
-        String sql = "SELECT * FROM DIRECTOR WHERE ID=?";
+        String sql = "SELECT * FROM DIRECTORS WHERE ID=?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> createDirector(rs), directorId)
                 .stream().findFirst().orElse(null);
     }
@@ -38,7 +38,7 @@ public class DbDirectorStorage implements DirectorStorage {
     public Director addDirector(Director director) {
         log.debug("Inserting new director into the database");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("director")
+                .withTableName("directors")
                 .usingGeneratedKeyColumns("id");
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("name", director.getName());
@@ -50,7 +50,7 @@ public class DbDirectorStorage implements DirectorStorage {
     @Override
     public Director updateDirector(Director director) {
         log.debug("Updating director with id={} in the database", director.getId());
-        String sql = "UPDATE DIRECTOR SET " +
+        String sql = "UPDATE DIRECTORS SET " +
                 "NAME = ? " +
                 "WHERE id = ?";
         jdbcTemplate.update(sql,
@@ -64,7 +64,7 @@ public class DbDirectorStorage implements DirectorStorage {
         log.debug("Removing a director with id={}", directorId);
         String sql = "DELETE FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?";
         jdbcTemplate.update(sql, directorId);
-        sql = "DELETE FROM DIRECTOR WHERE ID = ?";
+        sql = "DELETE FROM DIRECTORS WHERE ID = ?";
         jdbcTemplate.update(sql, directorId);
     }
 
