@@ -70,5 +70,6 @@ public class FilmController {
                                                 @RequestParam (value = "genreId") Integer genreId,
                                                 @RequestParam (value = "year") Integer year){
             return filmService.getPopularFilmGenreIdYear(count, genreId, year);
-        }
+
+    }
     }
