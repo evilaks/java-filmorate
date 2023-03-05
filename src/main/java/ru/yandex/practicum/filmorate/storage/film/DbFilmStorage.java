@@ -227,6 +227,30 @@ public class DbFilmStorage implements FilmStorage {
                 .build();
     }
 
+    @Override
+    public List<Film> getRecommendations(Long userId) {
+        String sql = " SELECT * " +
+                " FROM FILMS " +
+                " WHERE ID IN (" +
+                "    SELECT RESULT.BESTUSERSFILMS AS RECOMENDATION_FILM_ID " +
+                "    FROM (SELECT IFNULL(USERSFILMS.FILM_ID, -1) AS USERSFILMS, BESTUSERSFILMS.FILM_ID AS BESTUSERSFILMS " +
+                "          FROM (SELECT FILM_ID FROM LIKES WHERE USER_ID = ?) AS USERSFILMS " +
+                "                   RIGHT JOIN (SELECT FILM_ID " +
+                "                               FROM LIKES " +
+                "                               WHERE USER_ID IN (" +
+                "                                   SELECT BESTUSER.USER_ID " +
+                "                                   FROM (SELECT L2.USER_ID, COUNT(L2.USER_ID) " +
+                "                                         FROM (SELECT * FROM LIKES WHERE USER_ID = ?) AS L1 " +
+                "                                                  LEFT JOIN LIKES AS L2 ON L1.FILM_ID = L2.FILM_ID " +
+                "                                         WHERE L2.USER_ID <> ? " +
+                "                                         GROUP BY L2.USER_ID " +
+                "                                         ORDER BY COUNT(L2.USER_ID) DESC " +
+                "                                         LIMIT 1) AS BESTUSER)) AS BESTUSERSFILMS " +
+                "                              ON USERSFILMS.FILM_ID = BESTUSERSFILMS.FILM_ID) AS RESULT " +
+                "    WHERE RESULT.USERSFILMS = -1)";
+        return jdbcTemplate.query(sql,(rs,rowNum)->this.get(rs.getLong("ID")),userId,userId,userId);
+    }
+
     private Genre extractGenre(ResultSet rs) throws SQLException {
         return genreStorage.get(rs.getLong("genre_id"));
     }
