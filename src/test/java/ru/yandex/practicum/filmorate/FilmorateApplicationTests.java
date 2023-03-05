@@ -338,8 +338,8 @@ class FilmorateApplicationTests {
 		Film actual = filmController.addFilm(createNewFilm());
 		filmController.addLike(2L, 1L);
 
-		assertEquals(filmController.getPopularFilms(1).size(), 1, "size popular films");
-		assertEquals(filmController.getPopularFilms(10).get(0), actual, "most popular film");
+		assertEquals(filmController.getPopularFilmGenreIdYear(1, 0,0).size(), 1, "size popular films");
+		assertEquals(filmController.getPopularFilmGenreIdYear(10,0,0).get(0), actual, "most popular film");
 	}
 
 	@Test

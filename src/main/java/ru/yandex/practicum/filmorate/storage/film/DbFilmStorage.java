@@ -277,15 +277,14 @@ public class DbFilmStorage implements FilmStorage {
             ArrayList<Long> idFilms = new ArrayList<>(jdbcTemplate.queryForList(sql, Long.class, year));
             return idFilms;
 
-
         }else {
             log.debug("Extract from the database of popular films by genre and year genreId = "+ genreId + "year = " + year);
             String sql = "SELECT ID \n" +
                     "FROM (\n" +
                     "\tSELECT ID, COUNT(USER_ID) AS LIKES_COUNT \n" +
                     "\tFROM FILMS AS fi \n" +
-                    "\tINNER JOIN FILM_GENRE AS fg ON fi.id = fg.film_id \n" +
-                    "\tINNER JOIN LIKES AS li ON fi.id = li.film_id \n" +
+                    "\tLEFT JOIN FILM_GENRE AS fg ON fi.id = fg.film_id \n" +
+                    "\tLEFT JOIN LIKES AS li ON fi.id = li.film_id \n" +
                     "\tWHERE  EXTRACT(YEAR FROM RELEASE_DATE) = ? AND GENRE_ID = ? \n" +
                     "\tGROUP BY ID \n" +
                     "\tORDER BY LIKES_COUNT DESC) \n" +
