@@ -83,6 +83,7 @@ public class UserController {
         log.debug("Received DELETE-request at /users/{} endpoint", userId);
         userService.deleteUser(userId);
     }
+
     @GetMapping("/{userId}/recommendations")
     public List<Film> getRecommendations(@PathVariable Long userId) {
         return filmService.getRecommendations(userId);
