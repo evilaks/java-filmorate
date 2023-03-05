@@ -8,11 +8,12 @@ import ru.yandex.practicum.filmorate.service.DirectorService;
 import java.util.List;
 
 @RequestMapping("/directors")
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class DirectorController {
 
     private final DirectorService directorService;
+
 
     @GetMapping
     public List<Director> getAll() {
