@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Null;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -53,10 +55,7 @@ public class FilmController {
         return filmService.removeLike(filmId, userId);
     }
 
-    @GetMapping( "/films/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
-    }
+
 
     @GetMapping( "/films/common") //films/common?userId={userId}&friendId={friendId}
     public List<Film> getMoviesSharedFilmAndSort(@RequestParam (value = "userId") Long userId,
@@ -64,12 +63,16 @@ public class FilmController {
         return filmService.getFilmsSharedFilmAndSort(userId, friendId);
     }
 
-    @GetMapping(value = "/films/popular", params = {"count", "genreId", "year"}) //films/popular?count={limit}&genreId={genreId}&year={year}
-    @ResponseBody
-    public List<Film> getPopularFilmGenreIdYear(@RequestParam (value = "count") Integer count,
-                                                @RequestParam (value = "genreId") Integer genreId,
-                                                @RequestParam (value = "year") Integer year){
-            return filmService.getPopularFilmGenreIdYear(count, genreId, year);
+    @GetMapping( "/films/popular") //films/popular?count={limit}&genreId={genreId}&year={year}
 
+    public List<Film> getPopularFilmGenreIdYear(@RequestParam (defaultValue = "10") Integer count,
+                                                @RequestParam (defaultValue = "0") Integer genreId,
+                                                @RequestParam (defaultValue = "0") Integer year){
+        return filmService.getPopularFilmGenreIdYear(count, genreId, year);
     }
-    }
+
+//    @GetMapping( "/films/popular")
+//    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
+//        return filmService.getPopularFilms(count);
+//    }
+}

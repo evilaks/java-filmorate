@@ -137,8 +137,8 @@ public class FilmService {
         return mutualFilmList;
     }
 
-    public List<Film> getPopularFilmGenreIdYear(int limit, int genreId, int year){
-        List<Long> filmIdSorted = new ArrayList<>(filmStorage.getPopularFilmGenreIdYear(year, genreId, limit));
+    public List<Film> getPopularFilmGenreIdYear(int count, int genreId, int year){
+        List<Long> filmIdSorted = new ArrayList<>(filmStorage.getPopularFilmGenreIdYear(year, genreId, count));
         List<Film> mutualFilmList = new ArrayList<>();
         for(long t: filmIdSorted){
             mutualFilmList.add(filmStorage.get(t));
