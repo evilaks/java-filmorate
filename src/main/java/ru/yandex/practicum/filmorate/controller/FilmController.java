@@ -71,4 +71,11 @@ public class FilmController {
         return filmService.getFilmsSharedFilmAndSort(userId, friendId);
     }
 
+
+    @GetMapping("/films/director/{directorId}")
+    public List<Film> getSortedFilmsFromDirector(@PathVariable Long directorId,
+                                                 @RequestParam String sortBy) {
+        log.debug("Extracting films by director with id={} sorted by {}", directorId, sortBy);
+        return filmService.getSortedFilmsFromDirector(directorId, sortBy);
+    }
 }

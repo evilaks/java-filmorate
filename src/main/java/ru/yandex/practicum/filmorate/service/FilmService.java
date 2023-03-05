@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -22,7 +23,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
-
+    private final DirectorService directorService;
     private final UserStorage userStorage;
 
     public List<Film> getAllFilms() {
@@ -98,6 +99,15 @@ public class FilmService {
         return filmStorage.getPopularFilms(count);
     }
 
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        Director director = directorService.getDirector(directorId);
+        if (sortBy.isBlank() || (!sortBy.equals("year") && !sortBy.equals("likes"))) {
+            log.debug("Receiving films by director");
+            throw new BadRequestException("Bad request parameter 'sortBy'");
+        }
+        return filmStorage.getSortedFilmsFromDirector(director.getId(), sortBy);
+    }
+
     private Film normalizeGenresInFilm(Film film) {
         if (film.getGenres() != null) {
             film.setGenres(new ArrayList<>(new HashSet<>(film.getGenres())));
@@ -136,7 +146,7 @@ public class FilmService {
         List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
         List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
         List<Film> mutualFilmList = new ArrayList<>();
-        for (long t : filmLikesUserId) {
+        for(long t: filmLikesUserId){
             if (filmLikesFriendsId.contains(t)) {
                 mutualFilmList.add(filmStorage.get(t));
             }
