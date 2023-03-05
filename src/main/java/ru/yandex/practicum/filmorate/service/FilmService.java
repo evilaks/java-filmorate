@@ -146,7 +146,7 @@ public class FilmService {
         List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
         List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
         List<Film> mutualFilmList = new ArrayList<>();
-        for(long t: filmLikesUserId){
+        for (long t : filmLikesUserId) {
             if (filmLikesFriendsId.contains(t)) {
                 mutualFilmList.add(filmStorage.get(t));
             }

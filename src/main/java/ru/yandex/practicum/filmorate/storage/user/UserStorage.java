@@ -31,5 +31,4 @@ public interface UserStorage {
     void addEvent(Long userId, String type, String operation, Long entityId);
 
 
-
 }

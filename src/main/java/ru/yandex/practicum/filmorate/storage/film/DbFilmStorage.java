@@ -90,7 +90,7 @@ public class DbFilmStorage implements FilmStorage {
 
             String requestDirectors = "SELECT director_id FROM film_director WHERE film_id = ?";
             List<Director> filmDirectors = new ArrayList<>(jdbcTemplate.query(requestDirectors, (rs, rowNum)
-                                                                            -> extractDirector(rs), id));
+                    -> extractDirector(rs), id));
             film.setDirectors(filmDirectors);
         }
 
@@ -134,6 +134,9 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public void deleteFilm(Long filmId) {
         log.debug("Deleting a film with id={}", filmId);
+
+        String sqlFilmDirector = "DELETE FROM FILM_DIRECTOR WHERE FILM_ID=?";
+        jdbcTemplate.update(sqlFilmDirector, filmId);
 
         String sqlIdReview = "SELECT ID FROM REVIEWS WHERE FILM_ID = ?";
         List<Integer> reviews = jdbcTemplate.queryForList(sqlIdReview, Integer.class, filmId);
@@ -219,19 +222,20 @@ public class DbFilmStorage implements FilmStorage {
         switch (sortBy) {
             case "year":
                 sql = "SELECT FILMS.ID AS FILM_ID\n" +
-                            "FROM FILM_DIRECTOR\n" +
-                            "LEFT JOIN FILMS ON FILM_DIRECTOR.FILM_ID = FILMS.ID\n" +
-                            "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
-                            "ORDER BY EXTRACT (YEAR FROM FILMS.RELEASE_DATE)";
+                        "FROM FILM_DIRECTOR\n" +
+                        "LEFT JOIN FILMS ON FILM_DIRECTOR.FILM_ID = FILMS.ID\n" +
+                        "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
+                        "ORDER BY EXTRACT (YEAR FROM FILMS.RELEASE_DATE)";
                 break;
             case "likes":
                 sql = "SELECT FILM_DIRECTOR.FILM_ID\n" +
-                            "FROM FILM_DIRECTOR\n" +
-                            "LEFT JOIN LIKES ON FILM_DIRECTOR.FILM_ID = LIKES.FILM_ID\n" +
-                            "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
-                            "GROUP BY FILM_DIRECTOR.FILM_ID\n" +
-                            "ORDER BY COUNT(LIKES.USER_ID) DESC";
-        };
+                        "FROM FILM_DIRECTOR\n" +
+                        "LEFT JOIN LIKES ON FILM_DIRECTOR.FILM_ID = LIKES.FILM_ID\n" +
+                        "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
+                        "GROUP BY FILM_DIRECTOR.FILM_ID\n" +
+                        "ORDER BY COUNT(LIKES.USER_ID) DESC";
+        }
+        ;
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), directorId);
     }
 
