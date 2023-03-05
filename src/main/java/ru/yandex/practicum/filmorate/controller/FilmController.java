@@ -59,12 +59,6 @@ public class FilmController {
         return filmService.removeLike(filmId, userId);
     }
 
-
-//    @GetMapping("/films/popular")
-//    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-//        return filmService.getPopularFilms(count);
-//    }
-
     @GetMapping("/common") //films/common?userId={userId}&friendId={friendId}
     @ResponseBody
     public List<Film> getMoviesSharedFilmAndSort(@RequestParam(value = "userId") Long userId,
