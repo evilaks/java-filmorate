@@ -55,6 +55,7 @@ public class FilmService {
         } else {
             return filmStorage.update(this.normalizeGenresInFilm(film));
         }
+
     }
 
     public void deleteFilm(Long filmId) {
@@ -161,4 +162,9 @@ public class FilmService {
 
     }
 
+    public List<Film> getRecommendations(Long userId) {
+        //Проверим есть ли пользователь, для которого составляем рекомендацию
+        userService.getUser(userId);
+        return filmStorage.getRecommendations(userId);
+    }
 }

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -20,6 +22,7 @@ public class UserController {
 
     private final UserStorage userStorage;
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public List<User> getUsers() {
@@ -80,4 +83,9 @@ public class UserController {
         log.debug("Received DELETE-request at /users/{} endpoint", userId);
         userService.deleteUser(userId);
     }
+    @GetMapping("/{userId}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Long userId) {
+        return filmService.getRecommendations(userId);
+    }
+
 }

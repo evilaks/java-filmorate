@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,6 +10,9 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserControllerTest {
 
@@ -28,7 +30,7 @@ public class UserControllerTest {
 
         UserStorage testUserStorage = new InMemoryUserStorage();
         UserService testUserService = new UserService(testUserStorage);
-        testUserController = new UserController(testUserStorage, testUserService);
+        testUserController = new UserController(testUserStorage, testUserService,null);
     }
 
     @Test
