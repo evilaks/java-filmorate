@@ -17,12 +17,11 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     @Positive
-
     private Integer duration;
     private final Set<Long> likes = new HashSet<>();
     private Rating mpa;
     private List<Genre> genres;
-
+    private List<Director> directors;
 
     public Film addLike(long userId) {
         likes.add(userId);

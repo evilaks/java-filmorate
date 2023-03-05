@@ -1,18 +1,22 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.DbGenreStorage;
+import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -35,11 +39,12 @@ public class FilmControllerTest {
         FilmStorage testFilmStorage = new InMemoryFilmStorage();
         UserStorage testUserStorage = new InMemoryUserStorage();
         UserService testUserService = new UserService(testUserStorage);
-        FilmService testFilmService = new FilmService(testFilmStorage,
+        FilmService testFilmService = new FilmService(
+                testFilmStorage,
                 testUserService,
-                new GenreService(
-                        new DbGenreStorage(
-                                new JdbcTemplate())));
+                new GenreService(new DbGenreStorage(new JdbcTemplate())),
+                new DirectorService(new DbDirectorStorage(new JdbcTemplate()))
+        , new DbUserStorage(new JdbcTemplate()));
         testFilmController = new FilmController(testFilmService);
     }
 

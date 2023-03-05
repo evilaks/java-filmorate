@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -21,6 +23,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
+    private final DirectorService directorService;
+    private final UserStorage userStorage;
 
     public List<Film> getAllFilms() {
         return filmStorage.getAll()
@@ -51,7 +55,6 @@ public class FilmService {
         } else {
             return filmStorage.update(this.normalizeGenresInFilm(film));
         }
-
     }
 
     public Film addLike(Long filmId, Long userId) {
@@ -60,8 +63,10 @@ public class FilmService {
 
         if (!filmStorage.getLikes(film).contains(userId)) {
             filmStorage.addLike(film, userId);
-        } else throw new BadRequestException("The film has already got like from user " + userId);
-
+        } else {
+            throw new BadRequestException("The film has already got like from user " + userId);
+        }
+        userStorage.addEvent(userId, "LIKE", "ADD", filmId);
         return film;
     }
 
@@ -76,13 +81,25 @@ public class FilmService {
 
         if (filmStorage.getLikes(film).contains(userId)) {
             filmStorage.removeLike(film, userId);
-        } else throw new NotFoundException("Film has no like from user " + userId);
+        } else {
+            throw new NotFoundException("Film has no like from user " + userId);
+        }
+        userStorage.addEvent(userId, "LIKE", "REMOVE", filmId);
 
         return film;
     }
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        Director director = directorService.getDirector(directorId);
+        if (sortBy.isBlank() || (!sortBy.equals("year") && !sortBy.equals("likes"))) {
+            log.debug("Receiving films by director");
+            throw new BadRequestException("Bad request parameter 'sortBy'");
+        }
+        return filmStorage.getSortedFilmsFromDirector(director.getId(), sortBy);
     }
 
     private Film normalizeGenresInFilm(Film film) {
@@ -110,7 +127,7 @@ public class FilmService {
             return true;
         }
         if (film.getGenres() != null) {
-            for(Genre genre : film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 if (genreService.getGenre(genre.getId()) == null) {
                     return true;
                 }

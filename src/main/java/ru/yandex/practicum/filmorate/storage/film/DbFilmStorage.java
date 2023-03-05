@@ -7,10 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +29,8 @@ public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
+    private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
 
     @Override
     public Film add(Film film) {
@@ -52,6 +57,13 @@ public class DbFilmStorage implements FilmStorage {
             }
         }
 
+        if (film.getDirectors() != null) {
+            for (Director director : film.getDirectors()) {
+                String sql = "INSERT INTO film_director (film_id, director_id) VALUES (?, ?)";
+                jdbcTemplate.update(sql, film.getId(), director.getId());
+            }
+        }
+
         return this.get(film.getId());
     }
 
@@ -75,6 +87,11 @@ public class DbFilmStorage implements FilmStorage {
             String requestGenres = "SELECT genre_id FROM film_genre WHERE film_id=?";
             List<Genre> filmGenres = new ArrayList<>(jdbcTemplate.query(requestGenres, (rs, rowNum) -> extractGenre(rs), id));
             film.setGenres(filmGenres);
+
+            String requestDirectors = "SELECT director_id FROM film_director WHERE film_id = ?";
+            List<Director> filmDirectors = new ArrayList<>(jdbcTemplate.query(requestDirectors, (rs, rowNum)
+                                                                            -> extractDirector(rs), id));
+            film.setDirectors(filmDirectors);
         }
 
         return film;
@@ -100,6 +117,15 @@ public class DbFilmStorage implements FilmStorage {
             for (Genre genre : film.getGenres()) {
                 String insertQuery = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
                 jdbcTemplate.update(insertQuery, film.getId(), genre.getId());
+            }
+        }
+
+        String deleteQuery = "DELETE FROM film_director WHERE film_id = ?";
+        jdbcTemplate.update(deleteQuery, film.getId());
+        if (film.getDirectors() != null) {
+            for (Director director : film.getDirectors()) {
+                String insertQuery = "INSERT INTO film_director (film_id, director_id) VALUES (?, ?)";
+                jdbcTemplate.update(insertQuery, film.getId(), director.getId());
             }
         }
         return this.get(film.getId());
@@ -167,6 +193,28 @@ public class DbFilmStorage implements FilmStorage {
         log.debug("Extract from the database of movies shared with another user and sorted id={}", userId);
         return  jdbcTemplate.queryForList("SELECT FILM_ID FROM LIKES WHERE USER_ID=?", Long.class, userId);
         }
+
+    @Override
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        String sql = "";
+        switch (sortBy) {
+            case "year":
+                sql = "SELECT FILMS.ID AS FILM_ID\n" +
+                            "FROM FILM_DIRECTOR\n" +
+                            "LEFT JOIN FILMS ON FILM_DIRECTOR.FILM_ID = FILMS.ID\n" +
+                            "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
+                            "ORDER BY EXTRACT (YEAR FROM FILMS.RELEASE_DATE)";
+                break;
+            case "likes":
+                sql = "SELECT FILM_DIRECTOR.FILM_ID\n" +
+                            "FROM FILM_DIRECTOR\n" +
+                            "LEFT JOIN LIKES ON FILM_DIRECTOR.FILM_ID = LIKES.FILM_ID\n" +
+                            "WHERE FILM_DIRECTOR.DIRECTOR_ID = ?\n" +
+                            "GROUP BY FILM_DIRECTOR.FILM_ID\n" +
+                            "ORDER BY COUNT(LIKES.USER_ID) DESC";
+        };
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), directorId);
+    }
 
     @Override
     public List<Long> getPopularFilmGenreIdYear(int year, int genreId, int count) {
@@ -237,5 +285,9 @@ public class DbFilmStorage implements FilmStorage {
 
     private Genre extractGenre(ResultSet rs) throws SQLException {
         return genreStorage.get(rs.getLong("genre_id"));
+    }
+
+    private Director extractDirector(ResultSet rs) throws SQLException {
+        return directorStorage.getDirector(rs.getLong("director_id"));
     }
 }
