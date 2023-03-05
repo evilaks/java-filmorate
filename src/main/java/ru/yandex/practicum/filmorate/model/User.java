@@ -25,5 +25,4 @@ public class User {
         if (this.name == null || this.name.isBlank()) this.name = this.login;
         return this;
     }
-
 }

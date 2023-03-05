@@ -42,8 +42,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void remove(Film film) {
-        log.debug("Unimplemented \"remove\" method called");
+    public void deleteFilm(Long filmId) {
+        log.debug("Unimplemented \"deleteFilm\" method called");
     }
 
     @Override
@@ -94,6 +94,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
         log.debug("Unimplemented \"getSortedFilmsFromDirector\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long userId) {
+        log.debug("Unimplemented \"getRecommendations\" method called");
         return null;
     }
 }
