@@ -66,11 +66,11 @@ public class FilmController {
         return filmService.getFilmsSharedFilmAndSort(userId, friendId);
     }
 
-    @GetMapping( "/popular") //films/popular?count={limit}&genreId={genreId}&year={year}
+    @GetMapping("/popular") //films/popular?count={limit}&genreId={genreId}&year={year}
 
-    public List<Film> getPopularFilmGenreIdYear(@RequestParam (defaultValue = "10") Integer count,
-                                                @RequestParam (defaultValue = "0") Integer genreId,
-                                                @RequestParam (defaultValue = "0") Integer year){
+    public List<Film> getPopularFilmGenreIdYear(@RequestParam(defaultValue = "10") Integer count,
+                                                @RequestParam(defaultValue = "0") Integer genreId,
+                                                @RequestParam(defaultValue = "0") Integer year) {
         return filmService.getPopularFilmGenreIdYear(count, genreId, year);
     }
 
