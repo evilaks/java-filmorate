@@ -92,6 +92,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> searchFilms(String query, String by) {
+        log.debug("Unimplemented \"searchFilms\" method called");
+        return null;
+    }
+
+    @Override
     public List<Film> getRecommendations(Long userId) {
         log.debug("Unimplemented \"getRecommendations\" method called");
         return null;

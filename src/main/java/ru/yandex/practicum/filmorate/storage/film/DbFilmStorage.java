@@ -216,6 +216,42 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), directorId);
     }
 
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        log.debug("Extracting from the database films with {} equal to {}", by, query);
+        String sql = "";
+        switch (by) {
+            case "title":
+                sql = "SELECT ID AS FILM_ID\n" +
+                        "   FROM FILMS\n" +
+                        "   WHERE LOWER(TITLE) LIKE LOWER(?)";
+                break;
+            case "director":
+                sql = "SELECT FILM_DIRECTOR.FILM_ID\n" +
+                        "   FROM FILM_DIRECTOR\n" +
+                        "   LEFT JOIN DIRECTOR ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTOR.ID\n" +
+                        "   WHERE LOWER(DIRECTOR.NAME) LIKE LOWER(?)";
+                break;
+            case "director,title":
+            case "title,director":
+                sql = "  (SELECT ID AS FILM_ID\n" +
+                        "   FROM FILMS\n" +
+                        "   WHERE LOWER(TITLE) LIKE LOWER(?))\n" +
+                        "UNION\n" +
+                        "  (SELECT FILM_DIRECTOR.FILM_ID\n" +
+                        "   FROM FILM_DIRECTOR\n" +
+                        "   LEFT JOIN DIRECTOR ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTOR.ID\n" +
+                        "   WHERE LOWER(DIRECTOR.NAME) LIKE LOWER(?))\n" +
+                        "   ORDER BY FILM_ID DESC";
+                return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")),
+                        "%" + query + "%",
+                        "%" + query + "%"
+                        );
+        };
+        return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")),
+                "%" + query + "%");
+    }
+
     private Film createFilm(ResultSet rs) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("id"))

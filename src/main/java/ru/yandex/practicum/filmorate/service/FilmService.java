@@ -97,10 +97,19 @@ public class FilmService {
     public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
         Director director = directorService.getDirector(directorId);
         if (sortBy.isBlank() || (!sortBy.equals("year") && !sortBy.equals("likes"))) {
-            log.debug("Receiving films by director");
             throw new BadRequestException("Bad request parameter 'sortBy'");
         }
         return filmStorage.getSortedFilmsFromDirector(director.getId(), sortBy);
+    }
+
+    public List<Film> searchFilms(String query, String by) {
+        if (query.isBlank() || by.isBlank()
+                || (!by.equals("director") && !by.equals("title")
+                && !by.equals("director,title") && !by.equals("title,director"))) {
+            log.debug("Incorrect parameters");
+            throw new BadRequestException("Bad request parameter 'query' or 'by'");
+        }
+        return filmStorage.searchFilms(query, by);
     }
 
     private Film normalizeGenresInFilm(Film film) {
