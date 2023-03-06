@@ -59,11 +59,6 @@ public class FilmController {
         return filmService.removeLike(filmId, userId);
     }
 
-    @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
-    }
-
     @GetMapping("/common") //films/common?userId={userId}&friendId={friendId}
     @ResponseBody
     public List<Film> getMoviesSharedFilmAndSort(@RequestParam(value = "userId") Long userId,
@@ -71,6 +66,13 @@ public class FilmController {
         return filmService.getFilmsSharedFilmAndSort(userId, friendId);
     }
 
+    @GetMapping("/popular") //films/popular?count={limit}&genreId={genreId}&year={year}
+
+    public List<Film> getPopularFilmGenreIdYear(@RequestParam(defaultValue = "10") Integer count,
+                                                @RequestParam(defaultValue = "0") Integer genreId,
+                                                @RequestParam(defaultValue = "0") Integer year) {
+        return filmService.getPopularFilmGenreIdYear(count, genreId, year);
+    }
 
     @GetMapping("/director/{directorId}")
     public List<Film> getSortedFilmsFromDirector(@PathVariable Long directorId,

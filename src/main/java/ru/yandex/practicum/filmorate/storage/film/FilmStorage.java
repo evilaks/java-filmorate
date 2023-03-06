@@ -30,6 +30,8 @@ public interface FilmStorage {
 
     List<Long> getIdFilmsWithUserLikes(Long userId);
 
+    List<Long> getPopularFilmGenreIdYear(int count, int genreId, int year);
+
     List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy);
 
     List<Film> searchFilms(String query, String by);

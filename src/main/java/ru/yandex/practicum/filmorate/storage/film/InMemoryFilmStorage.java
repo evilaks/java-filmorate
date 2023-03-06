@@ -86,6 +86,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Long> getPopularFilmGenreIdYear(int count, int genreId, int year) {
+        log.debug("Unimplemented \"getPopularFilmGenreIdYear\" method called");
+        return null;
+    }
+
+    @Override
     public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
         log.debug("Unimplemented \"getSortedFilmsFromDirector\" method called");
         return null;

@@ -154,6 +154,10 @@ public class FilmService {
     }
 
     public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId) { //вывод общих с другом фильмов с сортировкой по их популярности.
+        if (userStorage.get(userId) == null || userStorage.get(friendId) == null) {
+            log.debug("Invalid User ID: User ID is Not found");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
         List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
         List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
         List<Film> mutualFilmList = new ArrayList<>();
@@ -169,7 +173,32 @@ public class FilmService {
             }
         });
         return mutualFilmList;
+    }
 
+    private void isInvalidCountOrGenreIdOrYear(int count, int genreId, int year) {
+        if (count < 1) {
+            log.debug("Invalid Count: Count is < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+        if (genreId < 0) {
+            log.debug("Invalid Genre ID: Genre ID < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+        if (year < 0) {
+            log.debug("Invalid Year: Year < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+    }
+
+    public List<Film> getPopularFilmGenreIdYear(int count, int genreId, int year) {
+        isInvalidCountOrGenreIdOrYear(count, genreId, year);
+        List<Long> filmIdSorted = new ArrayList<>(filmStorage.getPopularFilmGenreIdYear(year, genreId, count));
+        List<Film> filmListSorted = new ArrayList<>();
+        for (long t : filmIdSorted) {
+            filmListSorted.add(filmStorage.get(t));
+        }
+
+        return filmListSorted;
     }
 
     public List<Film> getRecommendations(Long userId) {
