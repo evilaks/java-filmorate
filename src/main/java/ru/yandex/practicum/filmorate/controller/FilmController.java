@@ -72,14 +72,14 @@ public class FilmController {
     }
 
 
-    @GetMapping("/films/director/{directorId}")
+    @GetMapping("/director/{directorId}")
     public List<Film> getSortedFilmsFromDirector(@PathVariable Long directorId,
                                                  @RequestParam String sortBy) {
         log.debug("Extracting films by director with id={} sorted by {}", directorId, sortBy);
         return filmService.getSortedFilmsFromDirector(directorId, sortBy);
     }
 
-    @GetMapping("/films/search")
+    @GetMapping("/search")
     public List<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
         log.debug("Received GET-request at /films/search endpoint with query {} and searching in {}", query, by);
         return filmService.searchFilms(query, by);

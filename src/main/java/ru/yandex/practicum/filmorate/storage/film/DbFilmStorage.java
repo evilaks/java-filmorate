@@ -29,7 +29,6 @@ public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
-    private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
 
     @Override
@@ -235,7 +234,7 @@ public class DbFilmStorage implements FilmStorage {
                         "GROUP BY FILM_DIRECTOR.FILM_ID\n" +
                         "ORDER BY COUNT(LIKES.USER_ID) DESC";
         }
-        ;
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), directorId);
     }
 
@@ -252,8 +251,8 @@ public class DbFilmStorage implements FilmStorage {
             case "director":
                 sql = "SELECT FILM_DIRECTOR.FILM_ID\n" +
                         "   FROM FILM_DIRECTOR\n" +
-                        "   LEFT JOIN DIRECTOR ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTOR.ID\n" +
-                        "   WHERE LOWER(DIRECTOR.NAME) LIKE LOWER(?)";
+                        "   LEFT JOIN DIRECTORS ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTORS.ID\n" +
+                        "   WHERE LOWER(DIRECTORS.NAME) LIKE LOWER(?)";
                 break;
             case "director,title":
             case "title,director":
@@ -263,14 +262,15 @@ public class DbFilmStorage implements FilmStorage {
                         "UNION\n" +
                         "  (SELECT FILM_DIRECTOR.FILM_ID\n" +
                         "   FROM FILM_DIRECTOR\n" +
-                        "   LEFT JOIN DIRECTOR ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTOR.ID\n" +
-                        "   WHERE LOWER(DIRECTOR.NAME) LIKE LOWER(?))\n" +
+                        "   LEFT JOIN DIRECTORS ON FILM_DIRECTOR.DIRECTOR_ID = DIRECTORS.ID\n" +
+                        "   WHERE LOWER(DIRECTORS.NAME) LIKE LOWER(?))\n" +
                         "   ORDER BY FILM_ID DESC";
                 return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")),
                         "%" + query + "%",
                         "%" + query + "%"
                         );
-        };
+        }
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")),
                 "%" + query + "%");
     }

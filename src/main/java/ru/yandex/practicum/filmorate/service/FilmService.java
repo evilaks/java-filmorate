@@ -71,7 +71,8 @@ public class FilmService {
         if (!filmStorage.getLikes(film).contains(userId)) {
             filmStorage.addLike(film, userId);
         } else {
-            throw new BadRequestException("The film has already got like from user " + userId);
+            log.debug("The film has already got like from user with id={}, " +
+                    "but we still return 200OK according to postman tests %)", userId);
         }
         userStorage.addEvent(userId, "LIKE", "ADD", filmId);
         return film;
