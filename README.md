@@ -4,7 +4,7 @@
 
 ## ER-диаграмма сервиса
 
-![ER-diagram](readme-files/filmorate-er-diagram-v2.png)
+![ER-diagram](readme-files/filmorate-er-diagram-v3.png)
 
 ### Примеры запросов к базе данных
 
