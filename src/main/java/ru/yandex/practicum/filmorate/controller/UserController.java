@@ -77,7 +77,14 @@ public class UserController {
         log.debug("Received GET-request at /users/{}/feed endpoint", userId);
         return userService.getEventFeed(userService.getUser(userId));
     }
-    @GetMapping("/users/{userId}/recommendations")
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.debug("Received DELETE-request at /users/{} endpoint", userId);
+        userService.deleteUser(userId);
+    }
+
+    @GetMapping("/{userId}/recommendations")
     public List<Film> getRecommendations(@PathVariable Long userId) {
         return filmService.getRecommendations(userId);
     }

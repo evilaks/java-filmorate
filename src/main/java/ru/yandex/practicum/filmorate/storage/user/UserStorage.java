@@ -16,7 +16,7 @@ public interface UserStorage {
 
     User update(User user);
 
-    void remove(User user);
+    void deleteUser(Long userId);
 
     User addFriend(User user, long friendId);
 
@@ -29,5 +29,6 @@ public interface UserStorage {
     Collection<Event> getEventFeed(User user);
 
     void addEvent(Long userId, String type, String operation, Long entityId);
+
 
 }

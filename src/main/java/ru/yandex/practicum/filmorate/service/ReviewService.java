@@ -85,7 +85,7 @@ public class ReviewService {
         }
     }
 
-    private void validateReview(Review review)  {
+    private void validateReview(Review review) {
         filmService.getFilm(review.getFilmId());  // check film existence
         userService.getUser(review.getUserId());  // check user existence
     }

@@ -58,6 +58,12 @@ public class FilmService {
 
     }
 
+    public void deleteFilm(Long filmId) {
+        Optional.ofNullable(filmStorage.get(filmId))
+                .orElseThrow(() -> new NotFoundException("Film for userId " + filmId + " not found!"));
+        filmStorage.deleteFilm(filmId);
+    }
+
     public Film addLike(Long filmId, Long userId) {
         Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
         userService.getUser(userId); // check if user exist, else throw 404
@@ -146,11 +152,11 @@ public class FilmService {
         return false;
     }
 
-    public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId){ //вывод общих с другом фильмов с сортировкой по их популярности.
+    public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId) { //вывод общих с другом фильмов с сортировкой по их популярности.
         List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
         List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
         List<Film> mutualFilmList = new ArrayList<>();
-        for(long t: filmLikesUserId){
+        for (long t : filmLikesUserId) {
             if (filmLikesFriendsId.contains(t)) {
                 mutualFilmList.add(filmStorage.get(t));
             }
