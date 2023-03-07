@@ -54,6 +54,14 @@ public class ReviewService {
         }
     }
 
+    public List<Review> findReviews(Integer count, Long filmId) {
+        if (filmId == null) {
+            return this.getAllReviews(count);
+        } else {
+            return this.getReviewsByFilmId(count, filmId);
+        }
+    }
+
     public List<Review> getAllReviews(Integer count) {
         return reviewStorage.getAll(count);
     }

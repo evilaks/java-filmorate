@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -237,6 +236,7 @@ public class DbFilmStorage implements FilmStorage {
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> this.get(rs.getLong("film_id")), directorId);
     }
+
 
     @Override
     public List<Film> searchFilms(String query, String by) {

@@ -49,11 +49,7 @@ public class ReviewController {
             @RequestParam(required = false) Long filmId
     ) {
         log.debug("Received GET-request at \"/reviews\" endpoint with params: count=" + count + ", filmId=" + filmId);
-        if (filmId == null) {
-            return reviewService.getAllReviews(count);
-        } else {
-            return reviewService.getReviewsByFilmId(count, filmId);
-        }
+        return reviewService.findReviews(count, filmId);
     }
 
     @PutMapping("/{reviewId}/like/{userId}")
