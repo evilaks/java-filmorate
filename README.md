@@ -4,7 +4,7 @@
 
 ## ER-диаграмма сервиса
 
-![ER-diagram](readme-files/filmorate-er-diagram.png)
+![ER-diagram](readme-files/filmorate-er-diagram-v3.png)
 
 ### Примеры запросов к базе данных
 
@@ -16,7 +16,7 @@ FROM users;
 
 #### Получение всех друзей пользователя с id=1
 ```SQL
-SELECT u.name, fr.status
+SELECT u.name, fr.is_approved
 FROM friendship_requests fr
 JOIN users u ON fr.friend_id = u.id
 WHERE fr.user_id = 1;
@@ -30,11 +30,11 @@ FROM films;
 
 #### Получение 10 самых популярных фильмов с количеством лайков
 ```SQL
-SELECT f.name,
+SELECT f.title,
        COUNT(l.user_id) total_likes
 FROM likes l
 LEFT JOIN films f ON f.id = l.film_id
-GROUP BY f.name
+GROUP BY f.title
 ORDER BY total_likes DESC
 LIMIT 10;  
 ```

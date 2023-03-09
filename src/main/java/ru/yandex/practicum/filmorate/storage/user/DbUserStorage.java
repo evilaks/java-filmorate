@@ -7,10 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -37,7 +40,6 @@ public class DbUserStorage implements UserStorage {
 
         Long id = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         user.setId(id);
-
         return user;
     }
 
@@ -66,18 +68,35 @@ public class DbUserStorage implements UserStorage {
                 "NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ? " +
                 "WHERE id = ?";
         jdbcTemplate.update(sql,
-                    user.getName(),
-                    user.getLogin(),
-                    user.getEmail(),
-                    user.getBirthday(),
-                    user.getId());
+                user.getName(),
+                user.getLogin(),
+                user.getEmail(),
+                user.getBirthday(),
+                user.getId());
 
         return user;
     }
 
     @Override
-    public void remove(User user) {
-        log.debug("Deleting user with id={} from the database [NOT IMPLEMENTED]", user.getId());
+    public void deleteUser(Long userId) {
+        log.debug("Deleting a user with id={}", userId);
+        String sqlEvent = "DELETE FROM EVENT_FEED WHERE USER_ID=?";
+        jdbcTemplate.update(sqlEvent, userId);
+
+        String sqlMarks = "DELETE FROM REVIEW_MARKS WHERE USER_ID=?";
+        jdbcTemplate.update(sqlMarks, userId);
+
+        String sqlReviews = "DELETE FROM REVIEWS WHERE USER_ID=?";
+        jdbcTemplate.update(sqlReviews, userId);
+
+        String sqlLikes = "DELETE FROM LIKES WHERE USER_ID=?";
+        jdbcTemplate.update(sqlLikes, userId);
+
+        String sqlFrend = "DELETE FROM FRIENDSHIP_REQUESTS WHERE USER_ID=? OR FRIEND_ID =?";
+        jdbcTemplate.update(sqlFrend, userId, userId);
+
+        String sqlUser = "DELETE FROM USERS WHERE ID=?";
+        jdbcTemplate.update(sqlUser, userId);
     }
 
     @Override
@@ -111,6 +130,8 @@ public class DbUserStorage implements UserStorage {
     @Override
     public void deleteAll() {
         log.debug("Deleting all data from users");
+        jdbcTemplate.update("DELETE FROM EVENT_FEED");
+        jdbcTemplate.update("ALTER TABLE EVENT_FEED ALTER COLUMN EVENT_ID RESTART WITH 1");
         jdbcTemplate.update("DELETE FROM LIKES");
         jdbcTemplate.update("DELETE FROM FRIENDSHIP_REQUESTS");
         jdbcTemplate.update("delete from users");
@@ -126,5 +147,39 @@ public class DbUserStorage implements UserStorage {
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    @Override
+    public Collection<Event> getEventFeed(User user) {
+        String sqlEvent = "SELECT * FROM EVENT_FEED WHERE USER_ID = ?";
+        return jdbcTemplate.query(sqlEvent, (resultSet, rowNum) -> getEventDb(resultSet), user.getId());
+
+    }
+
+    private Event getEventDb(ResultSet resultSet) throws SQLException {
+        long eventId = resultSet.getInt("EVENT_ID");
+        return new Event(
+                resultSet.getTimestamp("TIME").toInstant().toEpochMilli(),
+                resultSet.getLong("USER_ID"),
+                resultSet.getString("EVENT_TYPE"),
+                resultSet.getString("OPERATION"),
+                eventId,
+                resultSet.getLong("ENTITY_ID"));
+    }
+
+    @Override
+    public void addEvent(Long userId, String type, String operation, Long entityId) {
+        log.debug("Inserting new event into the database");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("EVENT_FEED")
+                .usingGeneratedKeyColumns("EVENT_ID");
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("TIME", Instant.now())
+                .addValue("USER_ID", userId)
+                .addValue("EVENT_TYPE", type)
+                .addValue("OPERATION", operation)
+                .addValue("ENTITY_ID", entityId);
+        simpleJdbcInsert.execute(params);
     }
 }

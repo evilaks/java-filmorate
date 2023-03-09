@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,6 +23,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
+    private final DirectorService directorService;
+    private final UserStorage userStorage;
 
     public List<Film> getAllFilms() {
         return filmStorage.getAll()
@@ -56,14 +58,23 @@ public class FilmService {
 
     }
 
+    public void deleteFilm(Long filmId) {
+        Optional.ofNullable(filmStorage.get(filmId))
+                .orElseThrow(() -> new NotFoundException("Film for userId " + filmId + " not found!"));
+        filmStorage.deleteFilm(filmId);
+    }
+
     public Film addLike(Long filmId, Long userId) {
         Film film = this.getFilm(filmId); // throws 404 if film doesn't exist
         userService.getUser(userId); // check if user exist, else throw 404
 
         if (!filmStorage.getLikes(film).contains(userId)) {
             filmStorage.addLike(film, userId);
-        } else throw new BadRequestException("The film has already got like from user " + userId);
-
+        } else {
+            log.debug("The film has already got like from user with id={}, " +
+                    "but we still return 200OK according to postman tests %)", userId);
+        }
+        userStorage.addEvent(userId, "LIKE", "ADD", filmId);
         return film;
     }
 
@@ -78,13 +89,34 @@ public class FilmService {
 
         if (filmStorage.getLikes(film).contains(userId)) {
             filmStorage.removeLike(film, userId);
-        } else throw new NotFoundException("Film has no like from user " + userId);
+        } else {
+            throw new NotFoundException("Film has no like from user " + userId);
+        }
+        userStorage.addEvent(userId, "LIKE", "REMOVE", filmId);
 
         return film;
     }
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        Director director = directorService.getDirector(directorId);
+        if (sortBy.isBlank() || (!sortBy.equals("year") && !sortBy.equals("likes"))) {
+            throw new BadRequestException("Bad request parameter 'sortBy'");
+        }
+        return filmStorage.getSortedFilmsFromDirector(director.getId(), sortBy);
+    }
+
+    public List<Film> searchFilms(String query, String by) {
+        if (query.isBlank() || by.isBlank()
+                || (!by.equals("director") && !by.equals("title")
+                && !by.equals("director,title") && !by.equals("title,director"))) {
+            log.debug("Incorrect parameters");
+            throw new BadRequestException("Bad request parameter 'query' or 'by'");
+        }
+        return filmStorage.searchFilms(query, by);
     }
 
     private Film normalizeGenresInFilm(Film film) {
@@ -112,7 +144,7 @@ public class FilmService {
             return true;
         }
         if (film.getGenres() != null) {
-            for(Genre genre : film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 if (genreService.getGenre(genre.getId()) == null) {
                     return true;
                 }
@@ -121,4 +153,57 @@ public class FilmService {
         return false;
     }
 
+    public List<Film> getFilmsSharedFilmAndSort(Long userId, Long friendId) { //вывод общих с другом фильмов с сортировкой по их популярности.
+        if (userStorage.get(userId) == null || userStorage.get(friendId) == null) {
+            log.debug("Invalid User ID: User ID is Not found");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+        List<Long> filmLikesUserId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(userId));
+        List<Long> filmLikesFriendsId = new ArrayList<>(filmStorage.getIdFilmsWithUserLikes(friendId));
+        List<Film> mutualFilmList = new ArrayList<>();
+        for (long t : filmLikesUserId) {
+            if (filmLikesFriendsId.contains(t)) {
+                mutualFilmList.add(filmStorage.get(t));
+            }
+        }
+        Collections.sort(mutualFilmList, new Comparator<Film>() {
+            @Override
+            public int compare(Film o1, Film o2) {
+                return o1.getLikes().size() - o2.getLikes().size();
+            }
+        });
+        return mutualFilmList;
+    }
+
+    private void isInvalidCountOrGenreIdOrYear(int count, int genreId, int year) {
+        if (count < 1) {
+            log.debug("Invalid Count: Count is < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+        if (genreId < 0) {
+            log.debug("Invalid Genre ID: Genre ID < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+        if (year < 0) {
+            log.debug("Invalid Year: Year < 1");
+            throw new ValidationException("Bad request parameter 'sortBy'");
+        }
+    }
+
+    public List<Film> getPopularFilmGenreIdYear(int count, int genreId, int year) {
+        isInvalidCountOrGenreIdOrYear(count, genreId, year);
+        List<Long> filmIdSorted = new ArrayList<>(filmStorage.getPopularFilmGenreIdYear(year, genreId, count));
+        List<Film> filmListSorted = new ArrayList<>();
+        for (long t : filmIdSorted) {
+            filmListSorted.add(filmStorage.get(t));
+        }
+
+        return filmListSorted;
+    }
+
+    public List<Film> getRecommendations(Long userId) {
+        //Проверим есть ли пользователь, для которого составляем рекомендацию
+        userService.getUser(userId);
+        return filmStorage.getRecommendations(userId);
+    }
 }

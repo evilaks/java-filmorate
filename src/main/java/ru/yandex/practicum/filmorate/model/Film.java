@@ -6,7 +6,10 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -17,12 +20,11 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     @Positive
-
     private Integer duration;
     private final Set<Long> likes = new HashSet<>();
     private Rating mpa;
     private List<Genre> genres;
-
+    private List<Director> directors;
 
     public Film addLike(long userId) {
         likes.add(userId);

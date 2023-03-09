@@ -42,8 +42,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void remove(Film film) {
-        log.debug("Unimplemented \"remove\" method called");
+    public void deleteFilm(Long filmId) {
+        log.debug("Unimplemented \"deleteFilm\" method called");
     }
 
     @Override
@@ -76,6 +76,36 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Long> getFilmLikes(Film film) {
         log.debug("Unimplemented \"getFilmLikes\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Long> getIdFilmsWithUserLikes(Long userId) {
+        log.debug("Unimplemented \"getIdFilmsWithUserLikes\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Long> getPopularFilmGenreIdYear(int count, int genreId, int year) {
+        log.debug("Unimplemented \"getPopularFilmGenreIdYear\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsFromDirector(Long directorId, String sortBy) {
+        log.debug("Unimplemented \"getSortedFilmsFromDirector\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        log.debug("Unimplemented \"searchFilms\" method called");
+        return null;
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long userId) {
+        log.debug("Unimplemented \"getRecommendations\" method called");
         return null;
     }
 }
